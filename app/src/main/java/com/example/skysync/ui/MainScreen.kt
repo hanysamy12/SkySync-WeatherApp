@@ -34,7 +34,7 @@ fun MainScreen() {
                 val homeViewModel = CurrentWeatherViewModelImp(WeatherRepositoryImp(WeatherRemoteDataSourceImp.getInstance()))/* ViewModelProvider(ScreenRoute.Home, HomeViewModelFactory(
                     WeatherRepositoryImp(WeatherRemoteDataSourceImp.getInstance()))).get(
                     HomeViewModel::class.java)*/
-                HomeScreen(navController, homeViewModel )
+                HomeScreen(/*navController, homeViewModel*/ )
             }
             composable(route = ScreenRoute.Favorite.route) {
                 FavoriteScreen(navController)
