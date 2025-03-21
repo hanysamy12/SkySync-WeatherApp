@@ -22,7 +22,8 @@ interface ApiService {
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") appId: String = "4d8ffcfda7b01ee2b930a3cd193273e4",
-        @Query("lang") language: String = "en"
+        @Query("lang") language: String = "en",
+        @Query("units") unit: String
     ): CurrentWeatherResponse
 
     @GET("forecast")
@@ -30,6 +31,7 @@ interface ApiService {
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") appId: String = "4d8ffcfda7b01ee2b930a3cd193273e4",
-        @Query("lang") language: String = "en"
+        @Query("lang") language: String = "en",
+        @Query("units") unit: String
     ): ForecastWeatherResponse
 }
