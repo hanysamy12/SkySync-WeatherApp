@@ -28,7 +28,7 @@ class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentW
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = repo.getCurrentWeather(lat, lon, lang,unit)
+                val result = null//repo.getCurrentWeather(lat, lon, lang,unit)
                 if (result != null) {
                     val weather: CurrentWeatherResponse = result
                     mutableWeather.postValue(weather)
@@ -50,7 +50,7 @@ class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentW
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = repo.getForecast(lat, lon, lang,unit)
+                val result = null //repo.getForecast(lat, lon, lang,unit)
                 if (result != null) {
                     val forecast: ForecastWeatherResponse = result
                     mutableForecast.postValue(forecast)

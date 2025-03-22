@@ -1,6 +1,7 @@
 package com.example.skysync.ui.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -10,21 +11,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.skysync.R
+import kotlinx.serialization.Serializable
 
 data class NavigationItem(
     val title: String, val icon: Painter, val route: String
 )
-
+@Serializable
 sealed class ScreenRoute(val route: String) {
+    @Serializable
     object Home : ScreenRoute("home")
+    @Serializable
     object Favorite : ScreenRoute("favorite")
+    @Serializable
     object Alerts : ScreenRoute("alerts")
+    @Serializable
     object Settings : ScreenRoute("settings")
+    @Serializable
+    object GoogleMap : ScreenRoute("googleMap")
 }
 
 @Composable
@@ -49,7 +56,7 @@ fun BottomNavigationBar(navController: NavController) {
             selectedNavigationIndex.intValue = index
         }
     }
-    NavigationBar(containerColor = colorResource(id = R.color.teal_700)) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.primary) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(selected = selectedNavigationIndex.intValue == index, onClick = {
                 selectedNavigationIndex.intValue = index
