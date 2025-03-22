@@ -9,18 +9,16 @@ class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource
     override suspend fun getCurrentWeather(
         lat: Double,
         lon: Double,
-        language: String,
-        unit: String
+        language: String
     ): CurrentWeatherResponse {
-       return remoteDataSource.getCurrentWeather(lat,lon,language="en",unit=unit)
+       return remoteDataSource.getCurrentWeather(lat,lon,language="en")
     }
 
     override suspend fun getForecast(
         lat: Double,
         lon: Double,
-        language: String,
-        unit: String
+        language: String
     ): ForecastWeatherResponse {
-        return remoteDataSource.getForecast(lat,lon,language="en", unit = unit)
+        return remoteDataSource.getForecast(lat,lon,language="en")
     }
 }

@@ -8,19 +8,17 @@ class WeatherRemoteDataSourceImp private constructor(val service: ApiService) :
     override suspend fun getCurrentWeather(
         lat: Double,
         lon: Double,
-        language: String,
-        unit: String
+        language: String
     ): CurrentWeatherResponse {
-        return service.getCurrentWeather(lat, lon,language=language, unit = unit)
+        return service.getCurrentWeather(lat, lon)
     }
 
     override suspend fun getForecast(
         lat: Double,
         lon: Double,
-        language: String,
-        unit: String
+        language: String
     ): ForecastWeatherResponse {
-        return service.getForecast(lat, lon,language=language, unit = unit)
+        return service.getForecast(lat, lon)
     }
 
     companion object {
