@@ -6,15 +6,16 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.skysync.R
+import androidx.compose.runtime.getValue
 
 data class NavigationItem(
     val title: String, val icon: Painter, val route: String
@@ -58,13 +59,11 @@ fun BottomNavigationBar(navController: NavController) {
                     launchSingleTop = true
                 }
             }, icon = { Icon(painter = item.icon, contentDescription = item.title) }, label = {
-                if (index == selectedNavigationIndex.intValue) {
-                    Text(
-                        item.title
-                        /*item.title, color = if (index == selectedNavigationIndex.intValue) Color.Black
-                        else Color.Gray*/
-                    )
-                }
+                if (index == selectedNavigationIndex.intValue){
+                Text( item.title
+                    /*item.title, color = if (index == selectedNavigationIndex.intValue) Color.Black
+                    else Color.Gray*/
+                )}
             })
         }
     }
