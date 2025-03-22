@@ -21,6 +21,7 @@ data class NavigationItem(
     val title: String, val icon: Painter, val route: String
 )
 
+
 sealed class ScreenRoute(val route: String) {
     object Home : ScreenRoute("home")
     object Favorite : ScreenRoute("favorite")
