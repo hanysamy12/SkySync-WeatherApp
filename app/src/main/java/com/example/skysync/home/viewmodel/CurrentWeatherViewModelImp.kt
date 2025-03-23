@@ -27,6 +27,8 @@ class CurrentWeatherViewModelImp(
     private val repo: WeatherRepository
 ) : CurrentWeatherViewModel,
     ViewModel() {
+        val lang : String = "en"
+    val unit : String = "metric"
     private val mutableWeather =
         MutableStateFlow<Response<CurrentWeatherResponse>>(Response.Loading)
     val weather: StateFlow<Response<CurrentWeatherResponse>> = mutableWeather
@@ -41,7 +43,7 @@ class CurrentWeatherViewModelImp(
     // Kelvin use units=standard
 
     override fun getCurrentWeather(
-        lang: String, unit: String
+        //lang: String, unit: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val location = getLatLongFromDataStore().first()
@@ -61,8 +63,7 @@ class CurrentWeatherViewModelImp(
 
     override fun getForecast(
 
-        lang: String,
-        unit: String
+       // lang: String, unit: String
     ) {
         viewModelScope.launch() {
             val location = getLatLongFromDataStore().first()

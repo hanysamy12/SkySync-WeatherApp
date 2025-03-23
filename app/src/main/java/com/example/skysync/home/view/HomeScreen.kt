@@ -3,6 +3,7 @@ package com.example.skysync.home.view
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -56,13 +58,13 @@ private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     LaunchedEffect(Unit) {
-        viewModel.getCurrentWeather("en", "metric")
-        viewModel.getForecast("en", "metric")
+        viewModel.getCurrentWeather()
+        viewModel.getForecast()
     }
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.tertiary
+            MaterialTheme.colorScheme.secondary
         ),
         start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
         end = androidx.compose.ui.geometry.Offset.Infinite // Bottom-right corner
@@ -70,48 +72,53 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradientBrush)
-            .padding(10.dp)
-            .verticalScroll(rememberScrollState())
-        , verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        when (uiWeatherState) {
-            is Response.Success -> {
-                val currentWeather = (uiWeatherState as Response.Success).data
-                CurrentWeatherShow(currentWeather, gradientBrush)
+    Box(Modifier.fillMaxSize()) {
+        Image(painter = painterResource(id = R.drawable.bg_home)
+        , contentDescription = "background Image", modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                //.background(gradientBrush)
+                .padding(10.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            when (uiWeatherState) {
+                is Response.Success -> {
+                    val currentWeather = (uiWeatherState as Response.Success).data
+                    CurrentWeatherShow(currentWeather, gradientBrush)
+                }
+
+                is Response.Failure -> {
+                    val msg = (uiWeatherState as Response.Failure).toString()
+                    MessageShow(msg)
+                }
+
+                is Response.Loading -> {
+                    ProgressShow()
+                }
             }
 
-            is Response.Failure -> {
-                val msg = (uiWeatherState as Response.Failure).toString()
-                MessageShow(msg)
+            //  }
+
+            when (uiForecastState) {
+                is Response.Success -> {
+                    val forecast = (uiForecastState as Response.Success).data
+                    ForecastShow(forecast, gradientBrush)
+                }
+
+                is Response.Failure -> {
+                    val msg = (uiForecastState as Response.Failure).toString()
+                    MessageShow(msg)
+                }
+
+                is Response.Loading -> {
+                    //  ProgressShow()
+                }
             }
 
-            is Response.Loading -> {
-                ProgressShow()
-            }
         }
-
-        //  }
-
-        when (uiForecastState) {
-            is Response.Success -> {
-                val forecast = (uiForecastState as Response.Success).data
-                ForecastShow(forecast, gradientBrush)
-            }
-
-            is Response.Failure -> {
-                val msg = (uiForecastState as Response.Failure).toString()
-                MessageShow(msg)
-            }
-
-            is Response.Loading -> {
-                //  ProgressShow()
-            }
-        }
-
     }
 }
 
@@ -187,7 +194,8 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                     Icon(
                         painterResource(R.drawable.ic_sunrise),
                         contentDescription = "sunrise icon",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Unspecified
                     )
                     val sunRiseTime = convertDateTime(currentWeather?.sys?.sunrise?.toLong() ?: 0)
                     Text(sunRiseTime.second, fontSize = 18.sp)
@@ -196,6 +204,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                         painterResource(R.drawable.ic_sunrise),
                         contentDescription = "sunset icon",
                         modifier = Modifier.size(20.dp)
+                       // , tint = Color.Unspecified
                     )
                     val sunSetTime = convertDateTime(currentWeather?.sys?.sunset?.toLong() ?: 0)
 
@@ -209,7 +218,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
             Row( // parent
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(gradientBrush, RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha=.3f), RoundedCornerShape(16.dp))
                 // .height(150.dp)
             ) {
                 Column(
@@ -230,8 +239,10 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             contentDescription = "humidity icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),
+                            tint = Color.Unspecified
                         )
+
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Humidity", fontSize = 14.sp)
                             Text("${currentWeather?.main?.humidity} %", fontSize = 12.sp)
@@ -242,7 +253,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white))
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
                     )
                     Row(
                         modifier = Modifier
@@ -256,7 +267,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             contentDescription = "wind icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Wind Speed", fontSize = 14.sp)
@@ -288,7 +299,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             contentDescription = "pressure icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Pressure", fontSize = 14.sp)
@@ -300,7 +311,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white))
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
                     )
                     Row(
                         modifier = Modifier
@@ -314,7 +325,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             contentDescription = "cloud icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Cloud", fontSize = 14.sp)
@@ -335,8 +346,8 @@ private fun ForecastShow(forecast: ForecastWeatherResponse?, gradientBrush: Brus
     Column(modifier = Modifier.fillMaxSize()) {
         LazyRow(
             modifier = Modifier.background(
-                gradientBrush,
-                // MaterialTheme.colorScheme.background,
+                //gradientBrush,
+                MaterialTheme.colorScheme.primary.copy(alpha=.3f),
                 shape = RoundedCornerShape(16.dp)
             )
         ) {
@@ -368,7 +379,7 @@ private fun HourItem(hourItem: ListItem?) {
     ) {
         val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0)
         Text(hour.second, fontSize = 16.sp)
-        Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp),tint = Color.Unspecified)
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -405,7 +416,7 @@ private fun DaysItem(dayItem: ListItem?) {
             Icon(
                 painterResource(R.drawable.ic_sunrise),
                 contentDescription = "icon desc",
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(26.dp),tint = Color.Unspecified
             )
             val day = convertDateTime(dayItem?.dt?.toLong() ?: 0)
             Text(day.first, fontSize = 20.sp)

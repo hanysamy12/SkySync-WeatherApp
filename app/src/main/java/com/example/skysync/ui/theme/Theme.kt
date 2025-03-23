@@ -1,6 +1,5 @@
 package com.example.skysync.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,12 +8,13 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-   /* primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80*/
+    /* primary = Purple80,
+     secondary = PurpleGrey80,
+     tertiary = Pink80*/
     primary = color1,
     secondary = color2,
     tertiary = color3
@@ -26,8 +26,9 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Pink40*/
     primary = color1,
     secondary = color2,
-    tertiary = color3
-
+    tertiary = color3,
+    background = color4,
+    onSurface = color2,
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
