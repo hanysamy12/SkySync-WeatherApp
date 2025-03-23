@@ -72,4 +72,12 @@ dependencies {
     //LiveData & Compose
     val compose_version = "1.0.0"
     implementation ("androidx.compose.runtime:runtime-livedata:$compose_version")
+    //Location
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    //DataStore
+    //Preferences DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    //Proto DataStore
+   // implementation("androidx.datastore:datastore-core:1.1.3")
+
 }

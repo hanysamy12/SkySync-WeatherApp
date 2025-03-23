@@ -4,7 +4,7 @@ import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 
 interface WeatherRepository {
-    suspend fun getCurrentWeather(lat : Double,lon : Double,language: String,unit: String): CurrentWeatherResponse
-    suspend fun getForecast(lat : Double,lon : Double,language: String,unit: String): ForecastWeatherResponse
+    suspend fun getCurrentWeather(lat: Long?, lon: Long?, language: String, unit: String): CurrentWeatherResponse
+    suspend fun getForecast(lat: Long?, lon: Long?, language: String, unit: String): ForecastWeatherResponse
 
 }

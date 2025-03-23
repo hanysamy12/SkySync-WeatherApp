@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.skysync.alerts.view.AlertsScreen
+import com.example.skysync.data.Location
 import com.example.skysync.data.remote.WeatherRemoteDataSourceImp
 import com.example.skysync.favorite.view.FavoriteScreen
 import com.example.skysync.home.view.HomeScreen
@@ -35,12 +36,14 @@ import com.example.skysync.ui.navigation.ScreenRoute
 import com.example.skysync.ui.theme.SkySyncTheme
 
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
-        val homeViewModel = ViewModelProvider(this, HomeViewModelFactory(WeatherRepositoryImp(
+        val homeViewModel = ViewModelProvider(this, HomeViewModelFactory(this,WeatherRepositoryImp(
             WeatherRemoteDataSourceImp.getInstance())))[CurrentWeatherViewModelImp::class.java]
+        Location(this).getLocation()
         setContent {
             SkySyncTheme {
                 MainScreen(homeViewModel)

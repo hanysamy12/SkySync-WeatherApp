@@ -7,20 +7,20 @@ import com.example.skysync.models.ForecastWeatherResponse
 class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource) :
     WeatherRepository{
     override suspend fun getCurrentWeather(
-        lat: Double,
-        lon: Double,
+        lat: Long?,
+        lon: Long?,
         language: String,
         unit: String
     ): CurrentWeatherResponse {
-       return remoteDataSource.getCurrentWeather(lat,lon,language="en",unit=unit)
+       return remoteDataSource.getCurrentWeather(lat,lon, language ="en", unit =unit)
     }
 
     override suspend fun getForecast(
-        lat: Double,
-        lon: Double,
+        lat: Long?,
+        lon: Long?,
         language: String,
         unit: String
     ): ForecastWeatherResponse {
-        return remoteDataSource.getForecast(lat,lon,language="en", unit = unit)
+        return remoteDataSource.getForecast(lat,lon, language ="en", unit = unit)
     }
 }
