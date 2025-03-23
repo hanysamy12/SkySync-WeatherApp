@@ -1,23 +1,83 @@
 package com.example.skysync.settings.view
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.skysync.R
 
+@Preview
 @Composable
- fun SettingsScreen(navController: NavController) {
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        Text(
-            text = "Settings Screen",
-            style = MaterialTheme.typography.headlineLarge
-        )
+fun SettingsScreen() {
+    var englishChecked by remember { mutableStateOf(true) }
+    val arabicChecked by remember { mutableStateOf(false) }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sunrise),
+                        contentDescription = "language Icon",
+                        modifier = Modifier.size(25.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text("Language", fontSize = 22.sp)
+                }
+
+                Row(modifier = Modifier.padding(16.dp)) {
+
+                    Row(Modifier.weight(.5f), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Checkbox(
+                            checked = englishChecked,
+                            onCheckedChange = { englishChecked = it })
+                        Text("English", fontSize = 22.sp) ///Fixed
+
+                    }
+                    Row(Modifier.weight(.5f), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Checkbox(
+                            checked = arabicChecked,
+                            onCheckedChange = { englishChecked = it })
+                        Text("Arabic", fontSize = 22.sp) ///Fixed
+                    }
+                }
+            }
+        }
     }
 }

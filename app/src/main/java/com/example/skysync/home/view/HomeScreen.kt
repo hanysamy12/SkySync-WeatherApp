@@ -3,6 +3,7 @@ package com.example.skysync.home.view
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,20 +23,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.skysync.R
+import com.example.skysync.Response
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
+import com.example.skysync.models.CurrentWeatherResponse
+import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.models.ListItem
 import java.time.Instant
 import java.time.ZoneId
@@ -48,41 +57,85 @@ private const val TAG = "HomeScreen"
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
-    val horizontalScroll = rememberScrollState()
-    //viewModel.getCurrentWeather(29.394859, 30.9028837, "en", "metric") //29.394859, 30.9028837
-    viewModel.getCurrentWeather( "en", "metric")
-    viewModel.getForecast(  "en", "metric")
-    val weatherState = viewModel.weather.observeAsState()
-    val forecastState = viewModel.forecast.observeAsState()
-    val messageState = viewModel.message.observeAsState()
-
-    val currentWeather = weatherState.value
-    val forecast = forecastState.value
-    Log.i(TAG, "HomeScreen Weather : $currentWeather")
-    Log.i(TAG, "HomeScreen Forecast :$forecast")
-    val currentdateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
-    val tempMeasure = "C"
+    LaunchedEffect(Unit) {
+        viewModel.getCurrentWeather()
+        viewModel.getForecast()
+    }
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.tertiary),
+            MaterialTheme.colorScheme.secondary
+        ),
         start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
         end = androidx.compose.ui.geometry.Offset.Infinite // Bottom-right corner
     )
-    //Fahrenheit use units=imperial
-    //Celsius use units=metric
-    // Kelvin use units=standard
+    val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
+    val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
+    Box(Modifier.fillMaxSize()) {
+        Image(painter = painterResource(id = R.drawable.bg_home)
+        , contentDescription = "background Image", modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                //.background(gradientBrush)
+                .padding(10.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            when (uiWeatherState) {
+                is Response.Success -> {
+                    val currentWeather = (uiWeatherState as Response.Success).data
+                    CurrentWeatherShow(currentWeather, gradientBrush)
+                }
+
+                is Response.Failure -> {
+                    val msg = (uiWeatherState as Response.Failure).toString()
+                    MessageShow(msg)
+                }
+
+                is Response.Loading -> {
+                    ProgressShow()
+                }
+            }
+
+            //  }
+
+            when (uiForecastState) {
+                is Response.Success -> {
+                    val forecast = (uiForecastState as Response.Success).data
+                    ForecastShow(forecast, gradientBrush)
+                }
+
+                is Response.Failure -> {
+                    val msg = (uiForecastState as Response.Failure).toString()
+                    MessageShow(msg)
+                }
+
+                is Response.Loading -> {
+                    //  ProgressShow()
+                }
+            }
+
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradientBrush: Brush) {
+    val currentdateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
+    val tempMeasure = "C"
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(gradientBrush),
+
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(horizontalScroll)
-                .fillMaxSize()
-                .padding(10.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -93,7 +146,9 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(
-                    modifier = Modifier.fillMaxHeight().weight(2f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(2f),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text("${currentWeather?.name}", fontSize = 25.sp)
@@ -101,7 +156,9 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                     Text("${currentdateTimePair.first}  ", fontSize = 20.sp)
                 }
                 Column(
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f),
                     horizontalAlignment = Alignment.End
                 ) {
                     Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 20.sp)
@@ -134,11 +191,11 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top
                 ) {
-
                     Icon(
                         painterResource(R.drawable.ic_sunrise),
                         contentDescription = "sunrise icon",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Unspecified
                     )
                     val sunRiseTime = convertDateTime(currentWeather?.sys?.sunrise?.toLong() ?: 0)
                     Text(sunRiseTime.second, fontSize = 18.sp)
@@ -147,6 +204,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                         painterResource(R.drawable.ic_sunrise),
                         contentDescription = "sunset icon",
                         modifier = Modifier.size(20.dp)
+                       // , tint = Color.Unspecified
                     )
                     val sunSetTime = convertDateTime(currentWeather?.sys?.sunset?.toLong() ?: 0)
 
@@ -154,20 +212,14 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                 }
             }
 
-            LazyRow(
-                modifier = Modifier.background(
-                    gradientBrush,
-                    shape = RoundedCornerShape(16.dp)
-                )
-            ) {
-                items(8) { i -> HourItem(forecast?.list?.get(i)) }
-                //Spacer(modifier = Modifier.width(6.dp))
-            }
+
+
 
             Row( // parent
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(gradientBrush, RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha=.3f), RoundedCornerShape(16.dp))
+                // .height(150.dp)
             ) {
                 Column(
                     modifier = Modifier //left
@@ -187,8 +239,10 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             contentDescription = "humidity icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),
+                            tint = Color.Unspecified
                         )
+
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Humidity", fontSize = 14.sp)
                             Text("${currentWeather?.main?.humidity} %", fontSize = 12.sp)
@@ -199,7 +253,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white))
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
                     )
                     Row(
                         modifier = Modifier
@@ -213,7 +267,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             contentDescription = "wind icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Wind Speed", fontSize = 14.sp)
@@ -245,7 +299,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             contentDescription = "pressure icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Pressure", fontSize = 14.sp)
@@ -257,7 +311,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white))
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
                     )
                     Row(
                         modifier = Modifier
@@ -271,7 +325,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                             contentDescription = "cloud icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f)
+                                .weight(1f),tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
                             Text("Cloud", fontSize = 14.sp)
@@ -280,13 +334,31 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                     }
                 }
             }
-
-            val daysList =
-                forecast?.list?.filterIndexed { index, _ -> index == 0 || index % 8 == 0 }
-            daysList?.forEach { day -> DaysItem(day) }
         }
     }
+}
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun ForecastShow(forecast: ForecastWeatherResponse?, gradientBrush: Brush) {
+
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyRow(
+            modifier = Modifier.background(
+                //gradientBrush,
+                MaterialTheme.colorScheme.primary.copy(alpha=.3f),
+                shape = RoundedCornerShape(16.dp)
+            )
+        ) {
+            items(8) { i -> HourItem(forecast?.list?.get(i)) }
+            //Spacer(modifier = Modifier.width(6.dp))
+
+        }
+        val daysList =
+            forecast?.list?.filterIndexed { index, _ -> index == 0 || index % 8 == 0 }
+        daysList?.forEach { day -> DaysItem(day) }
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -307,7 +379,7 @@ private fun HourItem(hourItem: ListItem?) {
     ) {
         val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0)
         Text(hour.second, fontSize = 16.sp)
-        Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp),tint = Color.Unspecified)
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -322,16 +394,15 @@ private fun HourItem(hourItem: ListItem?) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DaysItem(dayItem: ListItem?) {
-
+   // Log.i(TAG, "DaysItem: $dayItem ////////////////////////////")
     val tempMeasure = "C"
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            //.height(70.dp)
+            .height(70.dp)
             .padding(vertical = 8.dp)
-            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(24.dp)),
-        // .background(colorResource(id = R.color.teal_200), RoundedCornerShape(26.dp)),
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -345,7 +416,7 @@ private fun DaysItem(dayItem: ListItem?) {
             Icon(
                 painterResource(R.drawable.ic_sunrise),
                 contentDescription = "icon desc",
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(26.dp),tint = Color.Unspecified
             )
             val day = convertDateTime(dayItem?.dt?.toLong() ?: 0)
             Text(day.first, fontSize = 20.sp)
@@ -362,16 +433,16 @@ private fun DaysItem(dayItem: ListItem?) {
                 verticalAlignment = Alignment.Top
             ) {
                 Text("${dayItem?.main?.temp}", fontSize = 18.sp)
-                Text(tempMeasure, fontSize = 8.sp /*modifier = Modifier.padding(top = 12.dp)*/)
+                Text(tempMeasure, fontSize = 8.sp )
             }
             Text("/", fontSize = 20.sp)
             Row(//min
-                // modifier = Modifier.fillMaxWidth(),
+
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
                 Text("${dayItem?.main?.temp}", fontSize = 18.sp)
-                Text(tempMeasure, fontSize = 8.sp /*modifier = Modifier.padding(top = 12.dp)*/)
+                Text(tempMeasure, fontSize = 8.sp )
             }
         }
 
@@ -379,9 +450,30 @@ private fun DaysItem(dayItem: ListItem?) {
     }
 }
 
+@Composable
+private fun ProgressShow() {
+    Column(verticalArrangement = Arrangement.Center) {
+        LinearProgressIndicator()
+    }
+}
+
+@Composable
+private fun MessageShow(message: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp)
+            .background(Color.Gray),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(message, color = Color.White)
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 private fun convertDateTime(dateLong: Long): Pair<String, String> {
-    Log.i(TAG, "longDateTime: $dateLong")
+    // Log.i(TAG, "longDateTime: $dateLong")
     val instance = Instant.ofEpochSecond(dateLong)
     val dateFormater =
         DateTimeFormatter.ofPattern("EEE, dd MMM", Locale.ENGLISH).withZone(ZoneId.systemDefault())
