@@ -86,7 +86,7 @@ fun MainScreen(homeViewModel: CurrentWeatherViewModelImp) {
                 AlertsScreen(navController)
             }
             composable(route = ScreenRoute.Settings.route) {
-                SettingsScreen(navController)
+                SettingsScreen()
             }
             composable <  ScreenRoute.GoogleMap>{ //(route = ScreenRoute.GoogleMap.route) throws exception
                 MapScreen()
