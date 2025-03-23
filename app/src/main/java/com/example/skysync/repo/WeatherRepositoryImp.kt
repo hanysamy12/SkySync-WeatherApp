@@ -3,16 +3,17 @@ package com.example.skysync.repo
 import com.example.skysync.data.remote.WeatherRemoteDataSource
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
+import kotlinx.coroutines.flow.Flow
 
 class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource) :
-    WeatherRepository{
+    WeatherRepository {
     override suspend fun getCurrentWeather(
         lat: Long?,
         lon: Long?,
         language: String,
         unit: String
-    ): CurrentWeatherResponse {
-       return remoteDataSource.getCurrentWeather(lat,lon, language ="en", unit =unit)
+    ): Flow<CurrentWeatherResponse> {
+        return remoteDataSource.getCurrentWeather(lat, lon, language = "en", unit = unit)
     }
 
     override suspend fun getForecast(
@@ -20,7 +21,7 @@ class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource
         lon: Long?,
         language: String,
         unit: String
-    ): ForecastWeatherResponse {
-        return remoteDataSource.getForecast(lat,lon, language ="en", unit = unit)
+    ): Flow<ForecastWeatherResponse> {
+        return remoteDataSource.getForecast(lat, lon, language = "en", unit = unit)
     }
 }
