@@ -1,51 +1,18 @@
 package com.example.skysync.home.view
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.skysync.R
+import androidx.navigation.NavController
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
-import com.example.skysync.models.ListItem
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private const val TAG = "HomeScreen"
-
-//@Preview()
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     val horizontalScroll = rememberScrollState()
@@ -53,30 +20,14 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     viewModel.getCurrentWeather( "en", "metric")
     viewModel.getForecast(  "en", "metric")
     val weatherState = viewModel.weather.observeAsState()
-    val forecastState = viewModel.forecast.observeAsState()
     val messageState = viewModel.message.observeAsState()
+val currentWeather = weatherState.value
 
-    val currentWeather = weatherState.value
-    val forecast = forecastState.value
-    Log.i(TAG, "HomeScreen Weather : $currentWeather")
-    Log.i(TAG, "HomeScreen Forecast :$forecast")
-    val currentdateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
-    val tempMeasure = "C"
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.tertiary),
-        start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
-        end = androidx.compose.ui.geometry.Offset.Infinite // Bottom-right corner
-    )
-    //Fahrenheit use units=imperial
-    //Celsius use units=metric
-    // Kelvin use units=standard
-
+    Log.i(TAG, "HomeScreen: ${currentWeather?.weather?.get(0)?.description}")
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(gradientBrush),
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
@@ -392,4 +343,5 @@ private fun convertDateTime(dateLong: Long): Pair<String, String> {
     Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
     return Pair(formatedDate, formatedTime)
 }
+
 

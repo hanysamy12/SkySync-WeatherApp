@@ -1,5 +1,6 @@
 package com.example.skysync.home.viewmodel
 
+
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -10,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.skysync.Constants
 import com.example.skysync.data.locationDataStore
 import com.example.skysync.models.CurrentWeatherResponse
-import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -23,9 +23,6 @@ class CurrentWeatherViewModelImp(private val context: Context,private val repo: 
     ViewModel() {
     private val mutableWeather: MutableLiveData<CurrentWeatherResponse> = MutableLiveData()
     val weather: LiveData<CurrentWeatherResponse> = mutableWeather
-
-    private val mutableForecast: MutableLiveData<ForecastWeatherResponse> = MutableLiveData()
-    val forecast: LiveData<ForecastWeatherResponse> = mutableForecast
 
     private val mutableMessage: MutableLiveData<String> = MutableLiveData()
     val message: LiveData<String> = mutableMessage

@@ -1,6 +1,5 @@
 package com.example.skysync
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -46,54 +45,11 @@ class MainActivity : ComponentActivity() {
         Location(this).getLocation()
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel)
+                MainScreen()
             }
 
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun MainScreen(homeViewModel: CurrentWeatherViewModelImp) {
-    val navController = rememberNavController()
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Box(modifier = Modifier.height(60.dp)) {
-                BottomNavigationBar((navController))
-            }
-        },
-        floatingActionButton = { FloatingActionButton(onClick = {navController.navigate(ScreenRoute.GoogleMap)}){
-            Icon(Icons.Default.Add, contentDescription = "add location")
-        } }
-
-    ) { contentPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = ScreenRoute.Home.route,
-            modifier = Modifier.padding(contentPadding)
-
-        ) {
-            composable(route = ScreenRoute.Home.route) {
-                HomeScreen( homeViewModel)
-            }
-            composable(route = ScreenRoute.Favorite.route) {
-                FavoriteScreen(navController)
-            }
-            composable(route = ScreenRoute.Alerts.route) {
-                AlertsScreen(navController)
-            }
-            composable(route = ScreenRoute.Settings.route) {
-                SettingsScreen(navController)
-            }
-            composable <  ScreenRoute.GoogleMap>{ //(route = ScreenRoute.GoogleMap.route) throws exception
-                MapScreen()
-            }
-        }
-
-
-    }
-}
 
