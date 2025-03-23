@@ -1,19 +1,25 @@
 package com.example.skysync.home.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.skysync.Constants
+import com.example.skysync.data.locationDataStore
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.WeatherRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private const val TAG = "CurrentWeatherViewModel"
-class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentWeatherViewModel,
+class CurrentWeatherViewModelImp(private val context: Context,private val repo: WeatherRepository) : CurrentWeatherViewModel,
     ViewModel() {
     private val mutableWeather: MutableLiveData<CurrentWeatherResponse> = MutableLiveData()
     val weather: LiveData<CurrentWeatherResponse> = mutableWeather
@@ -23,12 +29,15 @@ class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentW
 
     private val mutableMessage: MutableLiveData<String> = MutableLiveData()
     val message: LiveData<String> = mutableMessage
+
+
     override  fun getCurrentWeather(
-        lat: Double, lon: Double, lang: String, unit : String
+         lang: String, unit : String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
+            val location =getLatLongFromDataStore().first()
             try {
-                val result = null//repo.getCurrentWeather(lat, lon, lang,unit)
+                val result = repo.getCurrentWeather(location.first, location.second, lang,unit)
                 if (result != null) {
                     val weather: CurrentWeatherResponse = result
                     mutableWeather.postValue(weather)
@@ -43,14 +52,15 @@ class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentW
     }
 
     override fun getForecast(
-        lat: Double,
-        lon: Double,
+
         lang: String,
         unit: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
+            val location =getLatLongFromDataStore().first()
+
             try {
-                val result = null //repo.getForecast(lat, lon, lang,unit)
+                val result = repo.getForecast(location.first, location.second, "en","metric")
                 if (result != null) {
                     val forecast: ForecastWeatherResponse = result
                     mutableForecast.postValue(forecast)
@@ -63,9 +73,18 @@ class CurrentWeatherViewModelImp(private val repo: WeatherRepository) : CurrentW
             }
         }
     }
+
+    private fun getLatLongFromDataStore(): Flow<Pair<Long?, Long?>>
+    {
+        return context.locationDataStore.data.map {
+            pref->val lat =pref[Constants.CURRENT_LAT_KEY]
+            val lon = pref[Constants.CURRENT_LON_KEY]
+            Pair(lat,lon)
+        }
+    }
 }
-class HomeViewModelFactory(private val repo: WeatherRepository): ViewModelProvider.Factory{
+class HomeViewModelFactory(private val context: Context,private val repo: WeatherRepository): ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>    ): T {
-        return CurrentWeatherViewModelImp(repo) as T
+        return CurrentWeatherViewModelImp(context,repo) as T
     }
 }

@@ -6,21 +6,21 @@ import com.example.skysync.models.ForecastWeatherResponse
 class WeatherRemoteDataSourceImp private constructor(val service: ApiService) :
     WeatherRemoteDataSource {
     override suspend fun getCurrentWeather(
-        lat: Double,
-        lon: Double,
+        lat: Long?,
+        lon: Long?,
         language: String,
         unit: String
     ): CurrentWeatherResponse {
-        return service.getCurrentWeather(lat, lon,language=language, unit = unit)
+        return service.getCurrentWeather(lat, lon, language =language, unit = unit)
     }
 
     override suspend fun getForecast(
-        lat: Double,
-        lon: Double,
+        lat: Long?,
+        lon: Long?,
         language: String,
         unit: String
     ): ForecastWeatherResponse {
-        return service.getForecast(lat, lon,language=language, unit = unit)
+        return service.getForecast(lat, lon, language =language, unit = unit)
     }
 
     companion object {
