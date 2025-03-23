@@ -49,8 +49,9 @@ private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     val horizontalScroll = rememberScrollState()
-    viewModel.getCurrentWeather(29.394859, 30.9028837, "en", "metric") //29.394859, 30.9028837
-    viewModel.getForecast(29.394859, 30.9028837, "en", "metric")
+    //viewModel.getCurrentWeather(29.394859, 30.9028837, "en", "metric") //29.394859, 30.9028837
+    viewModel.getCurrentWeather( "en", "metric")
+    viewModel.getForecast(  "en", "metric")
     val weatherState = viewModel.weather.observeAsState()
     val forecastState = viewModel.forecast.observeAsState()
     val messageState = viewModel.message.observeAsState()
@@ -92,20 +93,20 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.fillMaxHeight().weight(2f),
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text("${currentWeather?.name}", fontSize = 25.sp)
 
                     Text("${currentdateTimePair.first}  ", fontSize = 20.sp)
                 }
                 Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    horizontalAlignment = Alignment.End
                 ) {
                     Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 20.sp)
                     Text(
-                        "Feels Like: ${currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp}",
+                        "Feels: ${currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp}",
                         fontSize = 16.sp
                     )
                 }
@@ -294,7 +295,6 @@ private fun HourItem(hourItem: ListItem?) {
     Log.i(TAG, "HourItem: $hourItem")
     // var hour = "forecastList?.list"
     var icon: Painter = painterResource(R.drawable.ic_settings)
-    var temperature = "-13"
     var tempMeasure = "c"
     Column(
         modifier = Modifier
@@ -306,14 +306,14 @@ private fun HourItem(hourItem: ListItem?) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0)
-        Text(hour.second, fontSize = 20.sp)
+        Text(hour.second, fontSize = 16.sp)
         Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp))
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Top
         ) {
-            Text("${hourItem?.main?.temp}", fontSize = 20.sp)
+            Text("${hourItem?.main?.temp}", fontSize = 16.sp)
             Text(tempMeasure, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
         }
     }
@@ -330,7 +330,7 @@ private fun DaysItem(dayItem: ListItem?) {
             .fillMaxWidth()
             //.height(70.dp)
             .padding(vertical = 8.dp)
-            .border(2.dp, colorResource(id = R.color.black), RoundedCornerShape(24.dp)),
+            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(24.dp)),
         // .background(colorResource(id = R.color.teal_200), RoundedCornerShape(26.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
@@ -348,7 +348,7 @@ private fun DaysItem(dayItem: ListItem?) {
                 modifier = Modifier.size(26.dp)
             )
             val day = convertDateTime(dayItem?.dt?.toLong() ?: 0)
-            Text(day.first, fontSize = 22.sp)
+            Text(day.first, fontSize = 20.sp)
             // Text("${dayItem?.weather?.get(0)?.main}", fontSize = 20.sp)
         }
         Row(
@@ -361,8 +361,8 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 20.sp)
-                Text(tempMeasure, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
+                Text("${dayItem?.main?.temp}", fontSize = 18.sp)
+                Text(tempMeasure, fontSize = 8.sp /*modifier = Modifier.padding(top = 12.dp)*/)
             }
             Text("/", fontSize = 20.sp)
             Row(//min
@@ -370,8 +370,8 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 20.sp)
-                Text(tempMeasure, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
+                Text("${dayItem?.main?.temp}", fontSize = 18.sp)
+                Text(tempMeasure, fontSize = 8.sp /*modifier = Modifier.padding(top = 12.dp)*/)
             }
         }
 
