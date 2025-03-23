@@ -16,17 +16,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.skysync.R
 import androidx.compose.runtime.getValue
+import kotlinx.serialization.Serializable
 
 data class NavigationItem(
     val title: String, val icon: Painter, val route: String
 )
 
-
+@Serializable
 sealed class ScreenRoute(val route: String) {
     object Home : ScreenRoute("home")
     object Favorite : ScreenRoute("favorite")
     object Alerts : ScreenRoute("alerts")
     object Settings : ScreenRoute("settings")
+    @Serializable
+    object GoogleMap : ScreenRoute("googleMap")
+
 }
 
 @Composable
