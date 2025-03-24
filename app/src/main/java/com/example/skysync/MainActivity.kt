@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(homeViewModel: CurrentWeatherViewModelImp) {
     val navController = rememberNavController()
-
+val currentRoute = navController.currentBackStackEntry?.destination?.route
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -65,7 +65,8 @@ fun MainScreen(homeViewModel: CurrentWeatherViewModelImp) {
                 BottomNavigationBar((navController))
             }
         },
-        floatingActionButton = { FloatingActionButton(onClick = {navController.navigate(ScreenRoute.GoogleMap)}){
+        floatingActionButton =
+            { if(currentRoute == ScreenRoute.Favorite.route)FloatingActionButton(onClick = {navController.navigate(ScreenRoute.GoogleMap)}){
             Icon(Icons.Default.Add, contentDescription = "add location")
         } }
 

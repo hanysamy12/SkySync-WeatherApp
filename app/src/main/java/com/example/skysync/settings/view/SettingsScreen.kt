@@ -34,50 +34,235 @@ import com.example.skysync.R
 @Preview
 @Composable
 fun SettingsScreen() {
+    //language
     var englishChecked by remember { mutableStateOf(true) }
-    val arabicChecked by remember { mutableStateOf(false) }
+    var arabicChecked by remember { mutableStateOf(false) }
+    //location
+    var gpsChecked by remember { mutableStateOf(true) }
+    var mapChecked by remember { mutableStateOf(false) }
+    //speed
+    var meterChecked by remember { mutableStateOf(true) }
+    var mileChecked by remember { mutableStateOf(false) }
+    //temp
+    var kelvinChecked by remember { mutableStateOf(true) }
+    var celsiusChecked by remember { mutableStateOf(false) }
+    var fahrenheitChecked by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            ElevatedCard(
+        Column(
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ElevatedCard( //language
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp), colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.secondary
                 )
             ) {
-                Row(modifier = Modifier.padding(16.dp)) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_sunrise),
+                        painter = painterResource(id = R.drawable.ic_setting_languagesvg),
                         contentDescription = "language Icon",
-                        modifier = Modifier.size(25.dp),
+                        modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("Language", fontSize = 22.sp)
+                    Text("Language", fontSize = 18.sp)
                 }
 
-                Row(modifier = Modifier.padding(16.dp)) {
+                Row(modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
 
-                    Row(Modifier.weight(.5f), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Row(
+                        Modifier
+                            .weight(.5f)
+                            .height(30.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Checkbox(
-                            checked = englishChecked,
-                            onCheckedChange = { englishChecked = it })
-                        Text("English", fontSize = 22.sp) ///Fixed
-
+                            checked = englishChecked, onCheckedChange = {
+                                englishChecked = it
+                                arabicChecked = !it
+                            })
+                        Text("English", fontSize = 14.sp) ///Fixed
                     }
-                    Row(Modifier.weight(.5f), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Row(
+                        Modifier.weight(.5f),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Checkbox(
-                            checked = arabicChecked,
-                            onCheckedChange = { englishChecked = it })
-                        Text("Arabic", fontSize = 22.sp) ///Fixed
+                            checked = arabicChecked, onCheckedChange = {
+                                arabicChecked = it
+                                englishChecked = !it
+                            })
+                        Text("عربي", fontSize = 14.sp) ///Fixed
                     }
                 }
             }
+            ElevatedCard( //location
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings_map),
+                        contentDescription = "location Icon",
+                        modifier = Modifier.size(40.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text("Location", fontSize = 18.sp)
+                }
+
+                Row(modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    Row(
+                        Modifier
+                            .weight(.5f)
+                            .height(30.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = gpsChecked, onCheckedChange = {
+                                gpsChecked = it
+                                mapChecked = !it
+                            })
+                        Text("Gps", fontSize = 14.sp)
+                    }
+                    Row(
+                        Modifier.weight(.5f),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = mapChecked, onCheckedChange = {
+                                mapChecked = it
+                                gpsChecked = !it
+                            })
+                        Text("map", fontSize = 14.sp)
+                    }
+                }
+            }
+            ElevatedCard( //temp
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_setting_temp),
+                        contentDescription = "language Icon",
+                        modifier = Modifier.size(45.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text("Temperature", fontSize = 18.sp)
+                }
+
+                Row(modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    Row(
+                        Modifier
+                            .height(30.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = kelvinChecked, onCheckedChange = {
+                                kelvinChecked = it
+                                celsiusChecked = !it
+                                fahrenheitChecked=!it
+                            })
+                        Text("Kelvin", fontSize = 14.sp)
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = celsiusChecked, onCheckedChange = {
+                                celsiusChecked = it
+                                kelvinChecked = !it
+                                fahrenheitChecked=!it
+                            })
+                        Text("Celsius", fontSize = 14.sp)
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = fahrenheitChecked, onCheckedChange = {
+                                fahrenheitChecked = it
+                                celsiusChecked = !it
+                                kelvinChecked =!it
+                            })
+                        Text("Fahrenheit", fontSize = 14.sp)
+                    }
+                }
+            }
+            ElevatedCard( //wind
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_setting_wind),
+                        contentDescription = "wind Icon",
+                        modifier = Modifier.size(40.dp),
+                        tint = Color.Unspecified
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text("WindSpeed", fontSize = 18.sp)
+                }
+
+                Row(modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    Row(
+                        Modifier
+                            .weight(.5f)
+                            .height(30.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = mileChecked, onCheckedChange = {
+                                mileChecked = it
+                                meterChecked = !it
+                            })
+                        Text("miles/hour", fontSize = 14.sp)
+                    }
+                    Row(
+                        Modifier.weight(.5f),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = meterChecked, onCheckedChange = {
+                                meterChecked = it
+                                mileChecked = !it
+                            })
+                        Text("meter/sec", fontSize = 14.sp)
+                    }
+                }
+            }
+
         }
     }
 }

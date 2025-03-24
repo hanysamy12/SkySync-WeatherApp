@@ -1,21 +1,20 @@
 package com.example.skysync.ui.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.skysync.R
-import androidx.compose.runtime.getValue
 import kotlinx.serialization.Serializable
 
 data class NavigationItem(
@@ -28,6 +27,7 @@ sealed class ScreenRoute(val route: String) {
     object Favorite : ScreenRoute("favorite")
     object Alerts : ScreenRoute("alerts")
     object Settings : ScreenRoute("settings")
+
     @Serializable
     object GoogleMap : ScreenRoute("googleMap")
 
@@ -35,6 +35,7 @@ sealed class ScreenRoute(val route: String) {
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+
     val navigationItems = listOf(
         NavigationItem("Home", painterResource(R.drawable.ic_home), ScreenRoute.Home.route),
         NavigationItem(
@@ -55,7 +56,7 @@ fun BottomNavigationBar(navController: NavController) {
             selectedNavigationIndex.intValue = index
         }
     }
-    NavigationBar(containerColor = colorResource(id = R.color.teal_700)) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.primary) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(selected = selectedNavigationIndex.intValue == index, onClick = {
                 selectedNavigationIndex.intValue = index
@@ -64,11 +65,12 @@ fun BottomNavigationBar(navController: NavController) {
                     launchSingleTop = true
                 }
             }, icon = { Icon(painter = item.icon, contentDescription = item.title) }, label = {
-                if (index == selectedNavigationIndex.intValue){
-                Text( item.title
-                    /*item.title, color = if (index == selectedNavigationIndex.intValue) Color.Black
-                    else Color.Gray*/
-                )}
+                if (index == selectedNavigationIndex.intValue) {
+                    Text(
+                        item.title
+
+                    )
+                }
             })
         }
     }

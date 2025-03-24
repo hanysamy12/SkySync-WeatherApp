@@ -43,9 +43,9 @@ class CurrentWeatherViewModelImp(
     // Kelvin use units=standard
 
     override fun getCurrentWeather(
-        //lang: String, unit: String
+
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+       /* viewModelScope.launch(Dispatchers.IO) {
             val location = getLatLongFromDataStore().first()
             try {
 
@@ -58,14 +58,14 @@ class CurrentWeatherViewModelImp(
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
-        }
+        }*/
     }
 
     override fun getForecast(
 
        // lang: String, unit: String
     ) {
-        viewModelScope.launch() {
+        /*viewModelScope.launch() {
             val location = getLatLongFromDataStore().first()
 
             try {
@@ -79,7 +79,7 @@ class CurrentWeatherViewModelImp(
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
-        }
+        }*/
     }
 
     private fun getLatLongFromDataStore(): Flow<Pair<Long?, Long?>> {
