@@ -58,8 +58,9 @@ private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     LaunchedEffect(Unit) {
-        viewModel.getCurrentWeather()
-        viewModel.getForecast()
+      /*  viewModel.getCurrentWeather(language)
+        viewModel.getForecast(language)*/
+        viewModel.observeSettingsChange()
     }
     val gradientBrush = Brush.linearGradient(
         colors = listOf(

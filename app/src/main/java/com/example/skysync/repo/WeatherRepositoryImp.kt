@@ -13,7 +13,7 @@ class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource
         language: String,
         unit: String
     ): Flow<CurrentWeatherResponse> {
-        return remoteDataSource.getCurrentWeather(lat, lon, language = "en", unit = unit)
+        return remoteDataSource.getCurrentWeather(lat, lon, language,  unit)
     }
 
     override suspend fun getForecast(
@@ -22,6 +22,6 @@ class WeatherRepositoryImp(private val remoteDataSource: WeatherRemoteDataSource
         language: String,
         unit: String
     ): Flow<ForecastWeatherResponse> {
-        return remoteDataSource.getForecast(lat, lon, language = "en", unit = unit)
+        return remoteDataSource.getForecast(lat, lon, language , unit)
     }
 }

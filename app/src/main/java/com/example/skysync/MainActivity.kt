@@ -31,6 +31,9 @@ import com.example.skysync.home.viewmodel.HomeViewModelFactory
 import com.example.skysync.map.view.MapScreen
 import com.example.skysync.repo.WeatherRepositoryImp
 import com.example.skysync.settings.view.SettingsScreen
+import com.example.skysync.settings.viewmodel.SettingsViewModel
+import com.example.skysync.settings.viewmodel.SettingsViewModelFactory
+import com.example.skysync.settings.viewmodel.SettingsViewModelImp
 import com.example.skysync.ui.navigation.BottomNavigationBar
 import com.example.skysync.ui.navigation.ScreenRoute
 import com.example.skysync.ui.theme.SkySyncTheme
@@ -41,12 +44,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
-        val homeViewModel = ViewModelProvider(this, HomeViewModelFactory(this,WeatherRepositoryImp(
-            WeatherRemoteDataSourceImp.getInstance())))[CurrentWeatherViewModelImp::class.java]
+        val homeViewModel = ViewModelProvider(
+            this, HomeViewModelFactory(
+                this.application, WeatherRepositoryImp(
+                    WeatherRemoteDataSourceImp.getInstance()
+                )
+            )
+        )[CurrentWeatherViewModelImp::class.java]
         Location(this).getLocation()
+        val settingsViewModel = ViewModelProvider(
+            this,
+            SettingsViewModelFactory(this.application)
+        )[SettingsViewModelImp::class.java]
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel)
+                MainScreen(homeViewModel,settingsViewModel)
             }
 
         }
@@ -55,9 +67,9 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(homeViewModel: CurrentWeatherViewModelImp) {
+fun MainScreen(homeViewModel: CurrentWeatherViewModelImp,settingsViewModel: SettingsViewModel) {
     val navController = rememberNavController()
-val currentRoute = navController.currentBackStackEntry?.destination?.route
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -66,9 +78,15 @@ val currentRoute = navController.currentBackStackEntry?.destination?.route
             }
         },
         floatingActionButton =
-            { if(currentRoute == ScreenRoute.Favorite.route)FloatingActionButton(onClick = {navController.navigate(ScreenRoute.GoogleMap)}){
-            Icon(Icons.Default.Add, contentDescription = "add location")
-        } }
+            {
+                if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
+                    navController.navigate(
+                        ScreenRoute.GoogleMap
+                    )
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = "add location")
+                }
+            }
 
     ) { contentPadding ->
         NavHost(
@@ -78,7 +96,7 @@ val currentRoute = navController.currentBackStackEntry?.destination?.route
 
         ) {
             composable(route = ScreenRoute.Home.route) {
-                HomeScreen( homeViewModel)
+                HomeScreen(homeViewModel)
             }
             composable(route = ScreenRoute.Favorite.route) {
                 FavoriteScreen(navController)
@@ -87,9 +105,9 @@ val currentRoute = navController.currentBackStackEntry?.destination?.route
                 AlertsScreen(navController)
             }
             composable(route = ScreenRoute.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(settingsViewModel)
             }
-            composable <  ScreenRoute.GoogleMap>{ //(route = ScreenRoute.GoogleMap.route) throws exception
+            composable<ScreenRoute.GoogleMap> { //(route = ScreenRoute.GoogleMap.route) throws exception
                 MapScreen()
             }
         }

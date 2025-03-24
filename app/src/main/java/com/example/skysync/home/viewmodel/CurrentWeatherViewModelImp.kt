@@ -1,6 +1,8 @@
 package com.example.skysync.home.viewmodel
 
+import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,11 +13,13 @@ import com.example.skysync.data.locationDataStore
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.WeatherRepository
+import com.example.skysync.settings.viewmodel.settingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -23,12 +27,11 @@ import kotlinx.coroutines.launch
 private const val TAG = "CurrentWeatherViewModel"
 
 class CurrentWeatherViewModelImp(
-    private val context: Context,
+    private val application: Application,
     private val repo: WeatherRepository
 ) : CurrentWeatherViewModel,
     ViewModel() {
-        val lang : String = "en"
-    val unit : String = "metric"
+
     private val mutableWeather =
         MutableStateFlow<Response<CurrentWeatherResponse>>(Response.Loading)
     val weather: StateFlow<Response<CurrentWeatherResponse>> = mutableWeather
@@ -38,18 +41,29 @@ class CurrentWeatherViewModelImp(
     val forecast: StateFlow<Response<ForecastWeatherResponse>> = mutableForecast
 
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
+    override fun observeSettingsChange() {
+
+        viewModelScope.launch (Dispatchers.IO){
+            application.settingsDataStore.data
+                .map { settings ->settings[Constants.LANGUAGE_KEY] ?:"en"}
+                .distinctUntilChanged()
+                .collect{
+                        language -> getCurrentWeather(language)
+                    getForecast(language)
+                }
+        }
+    }
     //Fahrenheit use units=imperial
     //Celsius use units=metric
     // Kelvin use units=standard
 
-    override fun getCurrentWeather(
-
-    ) {
-       /* viewModelScope.launch(Dispatchers.IO) {
+    private fun getCurrentWeather(language: String, unit: String="metric") {
+        Log.i(TAG, "getCurrentWeather: Lang is ///$language//CONGRATS CONGRATS CONGRATS")
+        viewModelScope.launch(Dispatchers.IO) {
             val location = getLatLongFromDataStore().first()
             try {
 
-                val result = repo.getCurrentWeather(location.first, location.second, lang, unit)
+                val result = repo.getCurrentWeather(location.first, location.second, language, unit)
                 result
                     .catch { error -> mutableWeather.value = Response.Failure(error) }
                     .collect { weather ->
@@ -58,18 +72,17 @@ class CurrentWeatherViewModelImp(
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
-        }*/
+        }
     }
 
-    override fun getForecast(
+    private fun getForecast(language: String, unit : String = "metric") {
+        Log.i(TAG, "getCurrentWeather: CONGRATS CONGRATS CONGRATS")
 
-       // lang: String, unit: String
-    ) {
-        /*viewModelScope.launch() {
+        viewModelScope.launch() {
             val location = getLatLongFromDataStore().first()
 
             try {
-                val result = repo.getForecast(location.first, location.second, "en", "metric")
+                val result = repo.getForecast(location.first, location.second, language, unit)
                 result
                     .catch { error -> mutableForecast.value = Response.Failure(error) }
                     .collect { forecast ->
@@ -79,11 +92,11 @@ class CurrentWeatherViewModelImp(
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
-        }*/
+        }
     }
 
     private fun getLatLongFromDataStore(): Flow<Pair<Long?, Long?>> {
-        return context.locationDataStore.data.map { pref ->
+        return application.locationDataStore.data.map { pref ->
             val lat = pref[Constants.CURRENT_LAT_KEY]
             val lon = pref[Constants.CURRENT_LON_KEY]
             Pair(lat, lon)
@@ -91,7 +104,7 @@ class CurrentWeatherViewModelImp(
     }
 }
 
-class HomeViewModelFactory(private val context: Context, private val repo: WeatherRepository) :
+class HomeViewModelFactory(private val context: Application, private val repo: WeatherRepository) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CurrentWeatherViewModelImp(context, repo) as T

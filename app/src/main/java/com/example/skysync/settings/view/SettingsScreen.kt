@@ -26,14 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.skysync.R
+import com.example.skysync.settings.viewmodel.SettingsViewModel
 
-@Preview
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: SettingsViewModel) {
     //language
     var englishChecked by remember { mutableStateOf(true) }
     var arabicChecked by remember { mutableStateOf(false) }
@@ -89,6 +88,8 @@ fun SettingsScreen() {
                             checked = englishChecked, onCheckedChange = {
                                 englishChecked = it
                                 arabicChecked = !it
+                                    viewModel.setLanguage("en")
+
                             })
                         Text("English", fontSize = 14.sp) ///Fixed
                     }
@@ -101,6 +102,7 @@ fun SettingsScreen() {
                             checked = arabicChecked, onCheckedChange = {
                                 arabicChecked = it
                                 englishChecked = !it
+                                viewModel.setLanguage("ar")
                             })
                         Text("عربي", fontSize = 14.sp) ///Fixed
                     }
@@ -138,6 +140,7 @@ fun SettingsScreen() {
                             checked = gpsChecked, onCheckedChange = {
                                 gpsChecked = it
                                 mapChecked = !it
+                                viewModel.setLocationWay("gps")
                             })
                         Text("Gps", fontSize = 14.sp)
                     }
@@ -150,6 +153,7 @@ fun SettingsScreen() {
                             checked = mapChecked, onCheckedChange = {
                                 mapChecked = it
                                 gpsChecked = !it
+                                viewModel.setLocationWay("map")
                             })
                         Text("map", fontSize = 14.sp)
                     }
@@ -186,6 +190,7 @@ fun SettingsScreen() {
                                 kelvinChecked = it
                                 celsiusChecked = !it
                                 fahrenheitChecked=!it
+                                viewModel.setTempUnit("Kelvin")
                             })
                         Text("Kelvin", fontSize = 14.sp)
                     }
@@ -197,6 +202,7 @@ fun SettingsScreen() {
                                 celsiusChecked = it
                                 kelvinChecked = !it
                                 fahrenheitChecked=!it
+                                viewModel.setTempUnit("Celsius")
                             })
                         Text("Celsius", fontSize = 14.sp)
                     }
@@ -208,6 +214,7 @@ fun SettingsScreen() {
                                 fahrenheitChecked = it
                                 celsiusChecked = !it
                                 kelvinChecked =!it
+                                viewModel.setTempUnit("Fahrenheit")
                             })
                         Text("Fahrenheit", fontSize = 14.sp)
                     }
@@ -245,6 +252,7 @@ fun SettingsScreen() {
                             checked = mileChecked, onCheckedChange = {
                                 mileChecked = it
                                 meterChecked = !it
+                                viewModel.setWindUnit("miles")
                             })
                         Text("miles/hour", fontSize = 14.sp)
                     }
@@ -257,6 +265,7 @@ fun SettingsScreen() {
                             checked = meterChecked, onCheckedChange = {
                                 meterChecked = it
                                 mileChecked = !it
+                                viewModel.setWindUnit("meter")
                             })
                         Text("meter/sec", fontSize = 14.sp)
                     }
