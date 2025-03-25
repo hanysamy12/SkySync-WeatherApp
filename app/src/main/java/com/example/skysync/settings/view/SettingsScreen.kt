@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,27 +27,57 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.skysync.Constants
 import com.example.skysync.R
 import com.example.skysync.settings.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
+
     //language
-    var englishChecked by remember { mutableStateOf(true) }
+    var englishChecked by remember { mutableStateOf(false) }
     var arabicChecked by remember { mutableStateOf(false) }
     //location
-    var gpsChecked by remember { mutableStateOf(true) }
+    var gpsChecked by remember { mutableStateOf(false) }
     var mapChecked by remember { mutableStateOf(false) }
     //speed
-    var meterChecked by remember { mutableStateOf(true) }
+    var meterChecked by remember { mutableStateOf(false) }
     var mileChecked by remember { mutableStateOf(false) }
     //temp
-    var kelvinChecked by remember { mutableStateOf(true) }
+    var kelvinChecked by remember { mutableStateOf(false) }
     var celsiusChecked by remember { mutableStateOf(false) }
     var fahrenheitChecked by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        val settings=viewModel.getCredentialFromPref()
+        when(settings[Constants.SETTINGS_LANGUAGE]) {
+            "en" -> englishChecked = true
+            "ar" -> arabicChecked = true
+        }
+
+        // location
+        when(settings[Constants.SETTINGS_LOCATION]) {
+            "gps" -> gpsChecked = true
+            "map" -> mapChecked = true
+        }
+
+        //  wind
+        when(settings[Constants.SETTINGS_WIND]) {
+            "meter" -> meterChecked = true
+            "mile" -> mileChecked = true
+        }
+
+        //  temperature
+        when(settings[Constants.SETTINGS_TEMP]) {
+            "standard" -> kelvinChecked = true
+            "metric" -> celsiusChecked = true
+            "imperial" -> fahrenheitChecked = true
+        }
+
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -66,12 +97,12 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_languagesvg),
-                        contentDescription = "language Icon",
+                        contentDescription = stringResource(R.string.language_icon),
                         modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("Language", fontSize = 18.sp)
+                    Text(stringResource(R.string.language), fontSize = 18.sp)
                 }
 
                 Row(modifier = Modifier.padding(16.dp),
@@ -91,7 +122,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                     viewModel.setLanguage("en")
 
                             })
-                        Text("English", fontSize = 14.sp) ///Fixed
+                        Text(stringResource(R.string.english), fontSize = 14.sp) ///Fixed
                     }
                     Row(
                         Modifier.weight(.5f),
@@ -104,7 +135,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 englishChecked = !it
                                 viewModel.setLanguage("ar")
                             })
-                        Text("عربي", fontSize = 14.sp) ///Fixed
+                        Text(stringResource(R.string.arabic), fontSize = 14.sp) ///Fixed
                     }
                 }
             }
@@ -118,12 +149,12 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings_map),
-                        contentDescription = "location Icon",
+                        contentDescription = stringResource(R.string.location_icon),
                         modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("Location", fontSize = 18.sp)
+                    Text(stringResource(R.string.location), fontSize = 18.sp)
                 }
 
                 Row(modifier = Modifier.padding(16.dp),
@@ -142,7 +173,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 mapChecked = !it
                                 viewModel.setLocationWay("gps")
                             })
-                        Text("Gps", fontSize = 14.sp)
+                        Text(stringResource(R.string.gps), fontSize = 14.sp)
                     }
                     Row(
                         Modifier.weight(.5f),
@@ -155,7 +186,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 gpsChecked = !it
                                 viewModel.setLocationWay("map")
                             })
-                        Text("map", fontSize = 14.sp)
+                        Text(stringResource(R.string.map), fontSize = 14.sp)
                     }
                 }
             }
@@ -169,12 +200,12 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_temp),
-                        contentDescription = "language Icon",
+                        contentDescription = stringResource(R.string.temperature_icon),
                         modifier = Modifier.size(45.dp),
                         tint = Color.Unspecified
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("Temperature", fontSize = 18.sp)
+                    Text(stringResource(R.string.temperature), fontSize = 18.sp)
                 }
 
                 Row(modifier = Modifier.padding(16.dp),
@@ -192,7 +223,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 fahrenheitChecked=!it
                                 viewModel.setTempUnit("standard")
                             })
-                        Text("Kelvin", fontSize = 14.sp)
+                        Text(stringResource(R.string.kelvin), fontSize = 14.sp)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -204,7 +235,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 fahrenheitChecked=!it
                                 viewModel.setTempUnit("metric")
                             })
-                        Text("Celsius", fontSize = 14.sp)
+                        Text(stringResource(R.string.celsius), fontSize = 14.sp)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -216,7 +247,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 kelvinChecked =!it
                                 viewModel.setTempUnit("imperial")
                             })
-                        Text("Fahrenheit", fontSize = 14.sp)
+                        Text(stringResource(R.string.fahrenheit), fontSize = 14.sp)
                     }
                 }
             }
@@ -230,12 +261,12 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_wind),
-                        contentDescription = "wind Icon",
+                        contentDescription = stringResource(R.string.wind_icon),
                         modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
                     )
                     Spacer(Modifier.width(12.dp))
-                    Text("WindSpeed", fontSize = 18.sp)
+                    Text(stringResource(R.string.wind_speed), fontSize = 18.sp)
                 }
 
                 Row(modifier = Modifier.padding(16.dp),
@@ -252,9 +283,9 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                             checked = mileChecked, onCheckedChange = {
                                 mileChecked = it
                                 meterChecked = !it
-                                viewModel.setWindUnit("miles")
+                                viewModel.setWindUnit("mile")
                             })
-                        Text("miles/hour", fontSize = 14.sp)
+                        Text(stringResource(R.string.miles_hour), fontSize = 14.sp)
                     }
                     Row(
                         Modifier.weight(.5f),
@@ -267,7 +298,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 mileChecked = !it
                                 viewModel.setWindUnit("meter")
                             })
-                        Text("meter/sec", fontSize = 14.sp)
+                        Text(stringResource(R.string.meter_sec), fontSize = 14.sp)
                     }
                 }
             }

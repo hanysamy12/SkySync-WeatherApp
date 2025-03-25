@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language">اللغة</string>
+    <string name="language_icon">أيقونة اللغة</string>
+    <string name="location_icon">أيقونة الموقع</string>
+    <string name="location">الموقع</string>
+    <string name="gps">تلقائى</string>
+    <string name="map">خريطة</string>
+    <string name="temperature_icon">أيقونة الحرارة</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="kelvin">كلفن</string>
+    <string name="celsius">مئوية</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="wind_icon">أيقونة الرياح</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="miles_hour">ميل/ساعة</string>
+    <string name="meter_sec">متر/ثانية</string>
+</resources>

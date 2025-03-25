@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">SkySync</string>
+    <string name="app_name" translatable="false">SkySync</string>
+    <string name="language">Language</string>
+    <string name="language_icon">language Icon</string>
+    <string name="english" translatable="false">English</string>
+    <string name="arabic" translatable="false">عربي</string>
+    <string name="location_icon">location Icon</string>
+    <string name="location">Location</string>
+    <string name="gps">Gps</string>
+    <string name="map">map</string>
+    <string name="temperature_icon">temperature Icon</string>
+    <string name="temperature">Temperature</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="wind_icon">wind Icon</string>
+    <string name="wind_speed">Wind Speed</string>
+    <string name="miles_hour">miles/hour</string>
+    <string name="meter_sec">meter/sec</string>
 </resources>

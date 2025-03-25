@@ -1,7 +1,6 @@
 package com.example.skysync.home.view
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -51,25 +49,22 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private const val TAG = "HomeScreen"
 
 //@Preview()
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     LaunchedEffect(Unit) {
-      /*  viewModel.getCurrentWeather(language)
-        viewModel.getForecast(language)*/
         viewModel.getHomeData()
     }
-    val gradientBrush = Brush.linearGradient(
+   /* val gradientBrush = Brush.linearGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary,
             MaterialTheme.colorScheme.secondary
         ),
         start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
         end = androidx.compose.ui.geometry.Offset.Infinite // Bottom-right corner
-    )
+    )*/
     val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
@@ -88,7 +83,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
             when (uiWeatherState) {
                 is Response.Success -> {
                     val currentWeather = (uiWeatherState as Response.Success).data
-                    CurrentWeatherShow(currentWeather, gradientBrush)
+                    CurrentWeatherShow(currentWeather)
                 }
 
                 is Response.Failure -> {
@@ -106,7 +101,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
             when (uiForecastState) {
                 is Response.Success -> {
                     val forecast = (uiForecastState as Response.Success).data
-                    ForecastShow(forecast, gradientBrush)
+                    ForecastShow(forecast)
                 }
 
                 is Response.Failure -> {
@@ -126,8 +121,8 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradientBrush: Brush) {
-    val currentdateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
+private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
+    val currentDateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
     val tempMeasure = "C"
     Box(
         modifier = Modifier
@@ -140,7 +135,6 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //Text("$currentWeather")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 //.height(60.dp),
@@ -154,7 +148,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                 ) {
                     Text("${currentWeather?.name}", fontSize = 20.sp)
 
-                    Text("${currentdateTimePair.first}  ", fontSize = 16.sp)
+                    Text("${currentDateTimePair.first}  ", fontSize = 16.sp)
                 }
                 Column(
                     modifier = Modifier
@@ -185,7 +179,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-                    Text("Now: ${currentdateTimePair.second}", fontSize = 12.sp)
+                    Text("Now: ${currentDateTimePair.second}", fontSize = 12.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -254,7 +248,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f))
                     )
                     Row(
                         modifier = Modifier
@@ -312,7 +306,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha=.3f),)
+                            .background(colorResource(id = R.color.white).copy(alpha=.3f))
                     )
                     Row(
                         modifier = Modifier
@@ -341,7 +335,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun ForecastShow(forecast: ForecastWeatherResponse?, gradientBrush: Brush) {
+private fun ForecastShow(forecast: ForecastWeatherResponse?) {
 
 
     Column(modifier = Modifier.fillMaxSize()) {

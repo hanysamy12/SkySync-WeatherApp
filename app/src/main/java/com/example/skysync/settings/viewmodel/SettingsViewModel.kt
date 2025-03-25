@@ -6,4 +6,5 @@ interface SettingsViewModel {
     fun setLocationWay(locationWay:String)
     fun setTempUnit(temperatureMeasure: String)
     fun setWindUnit(windMeasure : String)
+    suspend fun getCredentialFromPref(): Map<String, String>
 }

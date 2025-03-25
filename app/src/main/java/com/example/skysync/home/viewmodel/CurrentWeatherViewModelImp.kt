@@ -48,7 +48,7 @@ private lateinit var temperatureUnit : String
         viewModelScope.launch (Dispatchers.IO){
             val currentSettings = application.settingsDataStore.data.first()
             language = currentSettings[Constants.LANGUAGE_KEY] ?: "en"
-            temperatureUnit = currentSettings[Constants.TEMPERATURE_UNIT] ?: "c"
+            temperatureUnit = currentSettings[Constants.TEMPERATURE_UNIT] ?: "metric"
         observeSettingsChange()
         getCurrentWeather(language,temperatureUnit)
         getForecast(language,temperatureUnit)
@@ -58,7 +58,7 @@ private lateinit var temperatureUnit : String
              application.settingsDataStore.data
                  .map { settings ->
                      val language = settings[Constants.LANGUAGE_KEY] ?: "en"
-                     val temperatureUnit = settings[Constants.TEMPERATURE_UNIT] ?: "c"
+                     val temperatureUnit = settings[Constants.TEMPERATURE_UNIT] ?: "metric"
                      Pair(language, temperatureUnit)
                  }
                  .distinctUntilChanged()
