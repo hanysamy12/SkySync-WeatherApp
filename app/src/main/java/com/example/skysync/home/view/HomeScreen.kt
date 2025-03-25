@@ -60,7 +60,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     LaunchedEffect(Unit) {
       /*  viewModel.getCurrentWeather(language)
         viewModel.getForecast(language)*/
-        viewModel.observeSettingsChange()
+        viewModel.getHomeData()
     }
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -152,9 +152,9 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                         .weight(2f),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Text("${currentWeather?.name}", fontSize = 25.sp)
+                    Text("${currentWeather?.name}", fontSize = 20.sp)
 
-                    Text("${currentdateTimePair.first}  ", fontSize = 20.sp)
+                    Text("${currentdateTimePair.first}  ", fontSize = 16.sp)
                 }
                 Column(
                     modifier = Modifier
@@ -165,7 +165,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                     Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 20.sp)
                     Text(
                         "Feels: ${currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp}",
-                        fontSize = 16.sp
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -177,15 +177,15 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top
                 ) {
-                    Text("${currentWeather?.main?.temp}", fontSize = 120.sp)
-                    Text(tempMeasure, fontSize = 20.sp, modifier = Modifier.padding(top = 12.dp))
+                    Text("${currentWeather?.main?.temp}", fontSize = 100.sp)
+                    Text(tempMeasure, fontSize = 16.sp, modifier = Modifier.padding(top = 12.dp))
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-                    Text("Now: ${currentdateTimePair.second}", fontSize = 16.sp)
+                    Text("Now: ${currentdateTimePair.second}", fontSize = 12.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -199,7 +199,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                         tint = Color.Unspecified
                     )
                     val sunRiseTime = convertDateTime(currentWeather?.sys?.sunrise?.toLong() ?: 0)
-                    Text(sunRiseTime.second, fontSize = 18.sp)
+                    Text(sunRiseTime.second, fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
                         painterResource(R.drawable.ic_sunrise),
@@ -209,7 +209,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?, gradient
                     )
                     val sunSetTime = convertDateTime(currentWeather?.sys?.sunset?.toLong() ?: 0)
 
-                    Text(sunSetTime.second, fontSize = 18.sp)
+                    Text(sunSetTime.second, fontSize = 14.sp)
                 }
             }
 
@@ -365,7 +365,7 @@ private fun ForecastShow(forecast: ForecastWeatherResponse?, gradientBrush: Brus
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HourItem(hourItem: ListItem?) {
-    Log.i(TAG, "HourItem: $hourItem")
+   // Log.i(TAG, "HourItem: $hourItem")
     // var hour = "forecastList?.list"
     var icon: Painter = painterResource(R.drawable.ic_settings)
     var tempMeasure = "c"
@@ -379,14 +379,14 @@ private fun HourItem(hourItem: ListItem?) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0)
-        Text(hour.second, fontSize = 16.sp)
+        Text(hour.second, fontSize = 14.sp)
         Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp),tint = Color.Unspecified)
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Top
         ) {
-            Text("${hourItem?.main?.temp}", fontSize = 16.sp)
+            Text("${hourItem?.main?.temp}", fontSize = 14.sp)
             Text(tempMeasure, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
         }
     }
@@ -420,7 +420,7 @@ private fun DaysItem(dayItem: ListItem?) {
                 modifier = Modifier.size(26.dp),tint = Color.Unspecified
             )
             val day = convertDateTime(dayItem?.dt?.toLong() ?: 0)
-            Text(day.first, fontSize = 20.sp)
+            Text(day.first, fontSize = 16.sp)
             // Text("${dayItem?.weather?.get(0)?.main}", fontSize = 20.sp)
         }
         Row(
@@ -433,7 +433,7 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 18.sp)
+                Text("${dayItem?.main?.temp}", fontSize = 14.sp)
                 Text(tempMeasure, fontSize = 8.sp )
             }
             Text("/", fontSize = 20.sp)
@@ -442,7 +442,7 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 18.sp)
+                Text("${dayItem?.main?.temp}", fontSize = 14.sp)
                 Text(tempMeasure, fontSize = 8.sp )
             }
         }
@@ -482,7 +482,7 @@ private fun convertDateTime(dateLong: Long): Pair<String, String> {
     val timeFormatter =
         DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH).withZone(ZoneId.systemDefault())
     val formatedTime = timeFormatter.format(instance)
-    Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
+   // Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
     return Pair(formatedDate, formatedTime)
 }
 

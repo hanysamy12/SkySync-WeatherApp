@@ -1,8 +1,8 @@
 package com.example.skysync.home.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -41,24 +41,40 @@ class CurrentWeatherViewModelImp(
     val forecast: StateFlow<Response<ForecastWeatherResponse>> = mutableForecast
 
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
-    override fun observeSettingsChange() {
 
+private lateinit var language: String
+private lateinit var temperatureUnit : String
+    override fun getHomeData() {
         viewModelScope.launch (Dispatchers.IO){
-            application.settingsDataStore.data
-                .map { settings ->settings[Constants.LANGUAGE_KEY] ?:"en"}
-                .distinctUntilChanged()
-                .collect{
-                        language -> getCurrentWeather(language)
-                    getForecast(language)
-                }
-        }
-    }
+            val currentSettings = application.settingsDataStore.data.first()
+            language = currentSettings[Constants.LANGUAGE_KEY] ?: "en"
+            temperatureUnit = currentSettings[Constants.TEMPERATURE_UNIT] ?: "c"
+        observeSettingsChange()
+        getCurrentWeather(language,temperatureUnit)
+        getForecast(language,temperatureUnit)
+    }}
+     private fun observeSettingsChange() {
+         viewModelScope.launch(Dispatchers.IO) {
+             application.settingsDataStore.data
+                 .map { settings ->
+                     val language = settings[Constants.LANGUAGE_KEY] ?: "en"
+                     val temperatureUnit = settings[Constants.TEMPERATURE_UNIT] ?: "c"
+                     Pair(language, temperatureUnit)
+                 }
+                 .distinctUntilChanged()
+                 .collect { (storeLanguage, storedTemperatureUnit) ->
+                     language = storeLanguage
+                     temperatureUnit = storedTemperatureUnit
+                 }
+         }
+     }
     //Fahrenheit use units=imperial
     //Celsius use units=metric
     // Kelvin use units=standard
 
-    private fun getCurrentWeather(language: String, unit: String="metric") {
-        Log.i(TAG, "getCurrentWeather: Lang is ///$language//CONGRATS CONGRATS CONGRATS")
+
+    private fun getCurrentWeather(language: String, unit: String ) {
+        Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit//////")
         viewModelScope.launch(Dispatchers.IO) {
             val location = getLatLongFromDataStore().first()
             try {
@@ -75,8 +91,8 @@ class CurrentWeatherViewModelImp(
         }
     }
 
-    private fun getForecast(language: String, unit : String = "metric") {
-        Log.i(TAG, "getCurrentWeather: CONGRATS CONGRATS CONGRATS")
+    private fun getForecast(language: String, unit: String ) {
+
 
         viewModelScope.launch() {
             val location = getLatLongFromDataStore().first()
@@ -102,6 +118,8 @@ class CurrentWeatherViewModelImp(
             Pair(lat, lon)
         }
     }
+
+
 }
 
 class HomeViewModelFactory(private val context: Application, private val repo: WeatherRepository) :

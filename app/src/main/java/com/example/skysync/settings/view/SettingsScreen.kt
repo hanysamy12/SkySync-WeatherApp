@@ -190,7 +190,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 kelvinChecked = it
                                 celsiusChecked = !it
                                 fahrenheitChecked=!it
-                                viewModel.setTempUnit("Kelvin")
+                                viewModel.setTempUnit("standard")
                             })
                         Text("Kelvin", fontSize = 14.sp)
                     }
@@ -202,7 +202,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 celsiusChecked = it
                                 kelvinChecked = !it
                                 fahrenheitChecked=!it
-                                viewModel.setTempUnit("Celsius")
+                                viewModel.setTempUnit("metric")
                             })
                         Text("Celsius", fontSize = 14.sp)
                     }
@@ -214,7 +214,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 fahrenheitChecked = it
                                 celsiusChecked = !it
                                 kelvinChecked =!it
-                                viewModel.setTempUnit("Fahrenheit")
+                                viewModel.setTempUnit("imperial")
                             })
                         Text("Fahrenheit", fontSize = 14.sp)
                     }
