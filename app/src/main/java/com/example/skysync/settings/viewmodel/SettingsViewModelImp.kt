@@ -1,23 +1,19 @@
 package com.example.skysync.settings.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skysync.Constants
+import com.example.skysync.repo.settingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private const val TAG = "SettingsViewModelImp"
-val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(Constants.SETTINGS_DATASTORE_NAME)
 
 class SettingsViewModelImp(private val application: Application) : SettingsViewModel, ViewModel() {
     override fun setLanguage(language: String) {

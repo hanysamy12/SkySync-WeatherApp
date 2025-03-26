@@ -3,7 +3,6 @@ package com.example.skysync.data
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,11 +11,8 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
 import com.example.skysync.Constants
+import com.example.skysync.repo.DataStoreRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -30,11 +26,10 @@ import kotlinx.coroutines.launch
 
 // At the top level of your kotlin file:
 private const val TAG = "Location"
-val Context.locationDataStore: DataStore<Preferences> by preferencesDataStore(Constants.LOCATION_DATASTORE_NAME)
-class Location(/*private val context: Context ,*/private val activity: Activity){
+class Location(private val activity: Activity,private val dataStoreRepository: DataStoreRepository){
     private lateinit var fusedClient: FusedLocationProviderClient
     /*private var stringAddress: MutableState<String> = mutableStateOf("")
-    lateinit var locationState: MutableState<Location>*/
+    late init var locationState: MutableState<Location>*/
 
     fun getLocation() {
         if (checkPermissions()) {
@@ -121,9 +116,6 @@ class Location(/*private val context: Context ,*/private val activity: Activity)
     }
 
     private suspend fun addLatLongToSharedPref(lat: Double, lon: Double){
-        activity.locationDataStore.edit {
-            pref ->pref[Constants.CURRENT_LAT_KEY] = lat.toLong()
-            pref[Constants.CURRENT_LON_KEY] = lon.toLong()
-        }
+        dataStoreRepository.addLatLongToSharedPref(lat,lon)
     }
 }

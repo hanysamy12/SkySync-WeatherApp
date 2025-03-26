@@ -29,6 +29,7 @@ import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
 import com.example.skysync.map.view.MapScreen
+import com.example.skysync.repo.DataStoreRepositoryImp
 import com.example.skysync.repo.WeatherRepositoryImp
 import com.example.skysync.settings.view.SettingsScreen
 import com.example.skysync.settings.viewmodel.SettingsViewModel
@@ -43,15 +44,15 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
         val homeViewModel = ViewModelProvider(
             this, HomeViewModelFactory(
-                this.application, WeatherRepositoryImp(
+                 WeatherRepositoryImp(
                     WeatherRemoteDataSourceImp.getInstance()
-                )
+                ), DataStoreRepositoryImp(this.application)
             )
         )[CurrentWeatherViewModelImp::class.java]
-        Location(this).getLocation()
+
+        Location(this, DataStoreRepositoryImp(this.application)).getLocation()
         val settingsViewModel = ViewModelProvider(
             this,
             SettingsViewModelFactory(this.application)

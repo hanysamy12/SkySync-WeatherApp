@@ -55,7 +55,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     LaunchedEffect(Unit) {
-        viewModel.getHomeData()
+        viewModel.loadInitialValues()
     }
    /* val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -447,7 +447,7 @@ private fun DaysItem(dayItem: ListItem?) {
 
 @Composable
 private fun ProgressShow() {
-    Column(verticalArrangement = Arrangement.Center) {
+    Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         LinearProgressIndicator()
     }
 }
