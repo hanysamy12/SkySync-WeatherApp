@@ -28,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,29 +52,47 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+//private const val TAG = "HomeScreen"
 
 //@Preview()
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
+    val fahrenheitSymbol = stringResource(R.string.fahrenheit_symbol)
+    val celsiusSymbol = stringResource(R.string.celsius_symbol)
+    val kelvinSymbol = stringResource(R.string.kelvin_symbol)
+    val mileSymbol = stringResource(R.string.miles_hour)
+    val meterSymbol = stringResource(R.string.meter_sec)
+
+    var lang = rememberSaveable { mutableStateOf("") }
+    var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
+    var windUnit = rememberSaveable { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        viewModel.loadInitialValues()
+        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues()
+        lang.value = language
+        windUnit.value = when (windSpeedUnit) {
+            "mile" -> mileSymbol
+            "meter" -> meterSymbol
+            else -> meterSymbol
+        }
+        tempUnitSymbol.value = when (temperatureUnit) {
+            "imperial" -> fahrenheitSymbol
+            "metric" -> celsiusSymbol
+            "standard" -> kelvinSymbol
+            else -> celsiusSymbol
+        }
     }
-   /* val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.secondary
-        ),
-        start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
-        end = androidx.compose.ui.geometry.Offset.Infinite // Bottom-right corner
-    )*/
     val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
+    //val language = viewModel.
     Box(Modifier.fillMaxSize()) {
-        Image(painter = painterResource(id = R.drawable.bg_home)
-        , contentDescription = "background Image", modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop)
+        Image(
+            painter = painterResource(id = R.drawable.bg_home),
+            contentDescription = "background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,7 +104,12 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
             when (uiWeatherState) {
                 is Response.Success -> {
                     val currentWeather = (uiWeatherState as Response.Success).data
-                    CurrentWeatherShow(currentWeather)
+                    CurrentWeatherShow(
+                        currentWeather,
+                        lang.value,
+                        tempUnitSymbol.value,
+                        windUnit.value
+                    )
                 }
 
                 is Response.Failure -> {
@@ -101,7 +127,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
             when (uiForecastState) {
                 is Response.Success -> {
                     val forecast = (uiForecastState as Response.Success).data
-                    ForecastShow(forecast)
+                    ForecastShow(forecast, lang.value, tempUnitSymbol.value)
                 }
 
                 is Response.Failure -> {
@@ -121,12 +147,18 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
-    val currentDateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0)
-    val tempMeasure = "C"
+private fun CurrentWeatherShow(
+    currentWeather: CurrentWeatherResponse?,
+    lang: String,
+    tempUnit: String,
+    windUnit: String
+) {
+    //Log.i(TAG, "CurrentWeatherShow: $lang // $tempUnit //$windUnit")
+    val currentDateTimePair = convertDateTime(currentWeather?.dt?.toLong() ?: 0,lang)
     Box(
         modifier = Modifier
             .fillMaxSize()
+
 
     ) {
         Column(
@@ -156,9 +188,14 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                         .weight(1f),
                     horizontalAlignment = Alignment.End
                 ) {
+                    val temp = if (lang == "ar") {
+                        numEnToAr((currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp).toString())
+                    } else {
+                        currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp
+                    }
                     Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 20.sp)
                     Text(
-                        "Feels: ${currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp}",
+                        "${stringResource(R.string.feels)} $temp",
                         fontSize = 12.sp
                     )
                 }
@@ -171,15 +208,20 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top
                 ) {
-                    Text("${currentWeather?.main?.temp}", fontSize = 100.sp)
-                    Text(tempMeasure, fontSize = 16.sp, modifier = Modifier.padding(top = 12.dp))
+                    val temp = if (lang == "ar") {
+                        numEnToAr(currentWeather?.main?.temp.toString())
+                    } else {
+                        currentWeather?.main?.temp.toString()
+                    }
+                    Text(temp, fontSize = 100.sp)
+                    Text(tempUnit, fontSize = 16.sp, modifier = Modifier.padding(top = 12.dp))
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-                    Text("Now: ${currentDateTimePair.second}", fontSize = 12.sp)
+                    Text("${stringResource(R.string.now)} ${currentDateTimePair.second}", fontSize = 12.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -192,16 +234,17 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                         modifier = Modifier.size(20.dp),
                         tint = Color.Unspecified
                     )
-                    val sunRiseTime = convertDateTime(currentWeather?.sys?.sunrise?.toLong() ?: 0)
+                    val sunRiseTime = convertDateTime(currentWeather?.sys?.sunrise?.toLong() ?: 0,lang)
+
                     Text(sunRiseTime.second, fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
                         painterResource(R.drawable.ic_sunrise),
                         contentDescription = "sunset icon",
                         modifier = Modifier.size(20.dp)
-                       // , tint = Color.Unspecified
+                        // , tint = Color.Unspecified
                     )
-                    val sunSetTime = convertDateTime(currentWeather?.sys?.sunset?.toLong() ?: 0)
+                    val sunSetTime = convertDateTime(currentWeather?.sys?.sunset?.toLong() ?: 0,lang)
 
                     Text(sunSetTime.second, fontSize = 14.sp)
                 }
@@ -213,7 +256,10 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
             Row( // parent
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha=.3f), RoundedCornerShape(16.dp))
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = .3f),
+                        RoundedCornerShape(16.dp)
+                    )
                 // .height(150.dp)
             ) {
                 Column(
@@ -239,8 +285,13 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                         )
 
                         Column(modifier = Modifier.weight(2f)) {
-                            Text("Humidity", fontSize = 14.sp)
-                            Text("${currentWeather?.main?.humidity} %", fontSize = 12.sp)
+                            Text(stringResource(R.string.humidity), fontSize = 14.sp)
+                            val humidity = if (lang == "ar") {
+                                numEnToAr(currentWeather?.main?.humidity.toString())
+                            } else {
+                                currentWeather?.main?.humidity .toString()
+                            }
+                            Text("${stringResource(R.string.percentage_sign)} $humidity", fontSize = 12.sp)
                         }
                     }
                     Box(
@@ -248,7 +299,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha=.3f))
+                            .background(colorResource(id = R.color.white).copy(alpha = .3f))
                     )
                     Row(
                         modifier = Modifier
@@ -262,11 +313,16 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                             contentDescription = "wind icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f),tint = Color.Unspecified
+                                .weight(1f), tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
-                            Text("Wind Speed", fontSize = 14.sp)
-                            Text("${currentWeather?.wind?.speed}", fontSize = 12.sp)
+                            Text(stringResource(R.string.wind_speed), fontSize = 14.sp)
+                            val speed = if (lang == "ar") {
+                                numEnToAr(currentWeather?.wind?.speed.toString())
+                            } else {
+                                currentWeather?.wind?.speed.toString()
+                            }
+                            Text("$speed $windUnit", fontSize = 12.sp)
                         }
                     }
                 }
@@ -294,11 +350,16 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                             contentDescription = "pressure icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f),tint = Color.Unspecified
+                                .weight(1f), tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
-                            Text("Pressure", fontSize = 14.sp)
-                            Text("${currentWeather?.main?.pressure}", fontSize = 12.sp)
+                            Text(stringResource(R.string.pressure), fontSize = 14.sp)
+                            val pressure = if (lang == "ar") {
+                                numEnToAr(currentWeather?.main?.pressure.toString())
+                            } else {
+                                currentWeather?.main?.pressure.toString()
+                            }
+                            Text(pressure, fontSize = 12.sp)
                         }
                     }
                     Box(
@@ -306,7 +367,7 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                             .fillMaxWidth()
                             .padding(5.dp)
                             .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha=.3f))
+                            .background(colorResource(id = R.color.white).copy(alpha = .3f))
                     )
                     Row(
                         modifier = Modifier
@@ -320,11 +381,16 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
                             contentDescription = "cloud icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .weight(1f),tint = Color.Unspecified
+                                .weight(1f), tint = Color.Unspecified
                         )
                         Column(modifier = Modifier.weight(2f)) {
-                            Text("Cloud", fontSize = 14.sp)
-                            Text("${currentWeather?.clouds?.all} %", fontSize = 12.sp)
+                            Text(stringResource(R.string.cloud), fontSize = 14.sp)
+                            val cloud = if (lang == "ar") {
+                                numEnToAr(currentWeather?.clouds?.all.toString())
+                            } else {
+                                currentWeather?.clouds?.all.toString()
+                            }
+                            Text("$cloud ${stringResource(R.string.percentage_sign)}", fontSize = 12.sp)
                         }
                     }
                 }
@@ -335,34 +401,34 @@ private fun CurrentWeatherShow(currentWeather: CurrentWeatherResponse?) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun ForecastShow(forecast: ForecastWeatherResponse?) {
+private fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUnit: String) {
 
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyRow(
             modifier = Modifier.background(
                 //gradientBrush,
-                MaterialTheme.colorScheme.primary.copy(alpha=.3f),
+                MaterialTheme.colorScheme.primary.copy(alpha = .3f),
                 shape = RoundedCornerShape(16.dp)
             )
         ) {
-            items(8) { i -> HourItem(forecast?.list?.get(i)) }
+            items(8) { i -> HourItem(forecast?.list?.get(i), lang, temUnit) }
             //Spacer(modifier = Modifier.width(6.dp))
 
         }
         val daysList =
             forecast?.list?.filterIndexed { index, _ -> index == 0 || index % 8 == 0 }
-        daysList?.forEach { day -> DaysItem(day) }
+        daysList?.forEach { day -> DaysItem(day, lang, temUnit) }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun HourItem(hourItem: ListItem?) {
-   // Log.i(TAG, "HourItem: $hourItem")
+private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
+
+   // Log.i(TAG, "HourItem: $lang // $tempUnit")
     // var hour = "forecastList?.list"
     var icon: Painter = painterResource(R.drawable.ic_settings)
-    var tempMeasure = "c"
     Column(
         modifier = Modifier
             //.width(60.dp)
@@ -372,25 +438,35 @@ private fun HourItem(hourItem: ListItem?) {
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0)
+        val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0,lang)
         Text(hour.second, fontSize = 14.sp)
-        Icon(icon, contentDescription = "icon description", modifier = Modifier.size(20.dp),tint = Color.Unspecified)
+        Icon(
+            icon,
+            contentDescription = "icon description",
+            modifier = Modifier.size(20.dp),
+            tint = Color.Unspecified
+        )
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Top
         ) {
-            Text("${hourItem?.main?.temp}", fontSize = 14.sp)
-            Text(tempMeasure, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
+            val temp =if (lang == "ar") {
+                numEnToAr(hourItem?.main?.temp.toString())
+            } else {
+                hourItem?.main?.temp.toString()
+            }
+            Text(temp, fontSize = 14.sp)
+            Text(tempUnit, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun DaysItem(dayItem: ListItem?) {
-   // Log.i(TAG, "DaysItem: $dayItem ////////////////////////////")
-    val tempMeasure = "C"
+private fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
+    // Log.i(TAG, "DaysItem: $dayItem ////////////////////////////")
+
 
     Row(
         modifier = Modifier
@@ -411,9 +487,9 @@ private fun DaysItem(dayItem: ListItem?) {
             Icon(
                 painterResource(R.drawable.ic_sunrise),
                 contentDescription = "icon desc",
-                modifier = Modifier.size(26.dp),tint = Color.Unspecified
+                modifier = Modifier.size(26.dp), tint = Color.Unspecified
             )
-            val day = convertDateTime(dayItem?.dt?.toLong() ?: 0)
+            val day = convertDateTime(dayItem?.dt?.toLong() ?: 0,lang)
             Text(day.first, fontSize = 16.sp)
             // Text("${dayItem?.weather?.get(0)?.main}", fontSize = 20.sp)
         }
@@ -427,8 +503,13 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 14.sp)
-                Text(tempMeasure, fontSize = 8.sp )
+                val temp = if (lang == "ar") {
+                    numEnToAr(dayItem?.main?.temp.toString())
+                } else {
+                    dayItem?.main?.temp.toString()
+                }
+                Text(temp, fontSize = 14.sp)
+                Text(temUnit, fontSize = 8.sp)
             }
             Text("/", fontSize = 20.sp)
             Row(//min
@@ -436,8 +517,13 @@ private fun DaysItem(dayItem: ListItem?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-                Text("${dayItem?.main?.temp}", fontSize = 14.sp)
-                Text(tempMeasure, fontSize = 8.sp )
+                val temp = if (lang == "ar") {
+                    numEnToAr(dayItem?.main?.temp.toString())
+                } else {
+                    dayItem?.main?.temp.toString()
+                }
+                Text(temp, fontSize = 14.sp)
+                Text(temUnit, fontSize = 8.sp)
             }
         }
 
@@ -447,7 +533,11 @@ private fun DaysItem(dayItem: ListItem?) {
 
 @Composable
 private fun ProgressShow() {
-    Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         LinearProgressIndicator()
     }
 }
@@ -467,16 +557,33 @@ private fun MessageShow(message: String) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun convertDateTime(dateLong: Long): Pair<String, String> {
-    // Log.i(TAG, "longDateTime: $dateLong")
+private fun convertDateTime(dateLong: Long,lang : String ): Pair<String, String> {
+   //  Log.i(TAG, "longDateTime: $local")
+
     val instance = Instant.ofEpochSecond(dateLong)
     val dateFormater =
-        DateTimeFormatter.ofPattern("EEE, dd MMM", Locale.ENGLISH).withZone(ZoneId.systemDefault())
-    val formatedDate = dateFormater.format(instance)
+        DateTimeFormatter.ofPattern("EEE, dd MMM", Locale(lang))
+            .withZone(ZoneId.systemDefault())
+    var formatedDate = dateFormater.format(instance)
     val timeFormatter =
-        DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH).withZone(ZoneId.systemDefault())
-    val formatedTime = timeFormatter.format(instance)
-   // Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
+        DateTimeFormatter.ofPattern("hh:mm a", Locale(lang))
+            .withZone(ZoneId.systemDefault())
+    var formatedTime = timeFormatter.format(instance)
+    // Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
+    if(Locale(lang).language=="ar")
+    {
+        formatedTime = numEnToAr(formatedTime)
+        formatedDate = numEnToAr(formatedDate)
+    }
     return Pair(formatedDate, formatedTime)
+}
+
+fun numEnToAr(input: String): String {
+    val englishNumbers = Regex("[0-9]")
+    val arabicNumber = arrayOf("٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩")
+
+    return englishNumbers.replace(input) {
+        arabicNumber[it.value.toInt()]
+    }
 }
 

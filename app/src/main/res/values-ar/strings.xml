@@ -13,6 +13,15 @@
     <string name="fahrenheit">فهرنهايت</string>
     <string name="wind_icon">أيقونة الرياح</string>
     <string name="wind_speed">سرعة الرياح</string>
-    <string name="miles_hour">ميل/ساعة</string>
-    <string name="meter_sec">متر/ثانية</string>
+    <string name="miles_hour">م/س</string>
+    <string name="meter_sec">م/ث</string>
+    <string name="fahrenheit_symbol">°ف</string>
+    <string name="celsius_symbol">°س</string>
+    <string name="kelvin_symbol">°ك</string>
+    <string name="feels">يشعر ك:</string>
+    <string name="now">الان</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="percentage_sign">٪</string>
+    <string name="pressure">الضغط</string>
+    <string name="cloud">الغيوم</string>
 </resources>

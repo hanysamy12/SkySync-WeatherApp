@@ -19,7 +19,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:configChanges="locale|orientation|screenSize|screenLayout|keyboardHidden"
             android:theme="@style/Theme.SkySync">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

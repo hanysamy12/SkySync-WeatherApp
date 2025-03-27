@@ -31,15 +31,20 @@ class DataStoreRepositoryImp(val application: Application) : DataStoreRepository
         }
     }
 
-    override suspend fun getLanguage(): String {
+    override suspend fun getLanguage(): Flow<String> {
         return application.settingsDataStore.data
             .map { it[Constants.LANGUAGE_KEY] ?: "en" }
-            .first()
     }
 
     override suspend fun getTemperatureUnit(): String {
         return application.settingsDataStore.data
             .map { it[Constants.TEMPERATURE_UNIT] ?: "metric" }
+            .first()
+    }
+
+    override suspend fun getWindUnit(): String {
+        return application.settingsDataStore.data
+            .map { it[Constants.WIND_SPEED_UNIT] ?: "meter" }
             .first()
     }
 

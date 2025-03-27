@@ -15,6 +15,15 @@
     <string name="fahrenheit">Fahrenheit</string>
     <string name="wind_icon">wind Icon</string>
     <string name="wind_speed">Wind Speed</string>
-    <string name="miles_hour">miles/hour</string>
-    <string name="meter_sec">meter/sec</string>
+    <string name="miles_hour">m/h</string>
+    <string name="meter_sec">m/s</string>
+    <string name="fahrenheit_symbol">°F</string>
+    <string name="celsius_symbol">°C</string>
+    <string name="kelvin_symbol">°K</string>
+    <string name="feels">Feels:</string>
+    <string name="now">Now:</string>
+    <string name="humidity">Humidity</string>
+    <string name="percentage_sign"> %</string>
+    <string name="pressure">Pressure</string>
+    <string name="cloud">Cloud</string>
 </resources>

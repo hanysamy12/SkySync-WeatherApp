@@ -1,7 +1,9 @@
 package com.example.skysync
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +32,7 @@ import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
 import com.example.skysync.map.view.MapScreen
+import com.example.skysync.repo.DataStoreRepository
 import com.example.skysync.repo.DataStoreRepositoryImp
 import com.example.skysync.repo.WeatherRepositoryImp
 import com.example.skysync.settings.view.SettingsScreen
@@ -38,37 +42,66 @@ import com.example.skysync.settings.viewmodel.SettingsViewModelImp
 import com.example.skysync.ui.navigation.BottomNavigationBar
 import com.example.skysync.ui.navigation.ScreenRoute
 import com.example.skysync.ui.theme.SkySyncTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Locale
+
+private const val TAG = "MainActivity"
+
 
 class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dataStoreRepo = DataStoreRepositoryImp(this.application)
+        Location(this, dataStoreRepo).getLocation()
+            lifecycleScope.launch {
+                changeLocal(dataStoreRepo, this@MainActivity)
+        }
+        /////ViewModels
         val homeViewModel = ViewModelProvider(
             this, HomeViewModelFactory(
-                 WeatherRepositoryImp(
+                WeatherRepositoryImp(
                     WeatherRemoteDataSourceImp.getInstance()
-                ), DataStoreRepositoryImp(this.application)
+                ), dataStoreRepo
             )
         )[CurrentWeatherViewModelImp::class.java]
-
-        Location(this, DataStoreRepositoryImp(this.application)).getLocation()
         val settingsViewModel = ViewModelProvider(
             this,
             SettingsViewModelFactory(this.application)
         )[SettingsViewModelImp::class.java]
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel,settingsViewModel)
+                MainScreen(homeViewModel, settingsViewModel)
+
             }
+
 
         }
     }
-}
+    suspend fun changeLocal(dateStoreRepository: DataStoreRepository, context: Context) {
+        dateStoreRepository.getLanguage().collect {
+                Log.i(TAG, "changeLocal: $it")
+                val locale = Locale(it)
+                Locale.setDefault(locale)
+                val config = context.resources.configuration
+                config.setLocale(locale)
+                config.setLayoutDirection(locale)
+                context.resources.updateConfiguration(config, context.resources.displayMetrics)
+                delay(600)
+               // recreate()
+
+            }
+        }
+
+    }
+
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(homeViewModel: CurrentWeatherViewModelImp,settingsViewModel: SettingsViewModel) {
+fun MainScreen(homeViewModel: CurrentWeatherViewModelImp, settingsViewModel: SettingsViewModel) {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntry?.destination?.route
     Scaffold(

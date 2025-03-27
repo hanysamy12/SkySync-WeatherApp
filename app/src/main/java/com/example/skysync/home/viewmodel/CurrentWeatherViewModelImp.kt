@@ -22,10 +22,8 @@ import kotlinx.coroutines.launch
 private const val TAG = "CurrentWeatherViewModel"
 
 class CurrentWeatherViewModelImp(
-    private val repo: WeatherRepository,
-    private val dataStoreRepo: DataStoreRepository
-) : CurrentWeatherViewModel,
-    ViewModel() {
+    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+) : CurrentWeatherViewModel, ViewModel() {
 
     private val mutableWeather =
         MutableStateFlow<Response<CurrentWeatherResponse>>(Response.Loading)
@@ -40,6 +38,7 @@ class CurrentWeatherViewModelImp(
 
     private var language by mutableStateOf("en")
     private var temperatureUnit by mutableStateOf("metric")
+    private var windUnit by mutableStateOf("meter")
 
     /*
         override fun getHomeData() {
@@ -70,26 +69,28 @@ class CurrentWeatherViewModelImp(
     //Celsius use units=metric
     // Kelvin use units=standard
 
-    override fun loadInitialValues() {
+    override fun loadInitialValues(): Triple<String, String, String> {
         viewModelScope.launch {
             try {
-                language = dataStoreRepo.getLanguage()
+                language = dataStoreRepo.getLanguage().first()
                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                windUnit = dataStoreRepo.getWindUnit()
+
                 dataStoreRepo.getLatLongFromDataStore().first().let { (lat, lon) ->
                     if (lat != null && lon != null) {
                         getCurrentWeather(lat, lon, language, temperatureUnit)
                         getForecast(lat, lon, language, temperatureUnit)
+
                     } else {
                         mutableMessage.value = Response.Failure(Exception("Location Not Enabled"))
                     }
                 }
 
-                language = dataStoreRepo.getLanguage()
-                temperatureUnit = dataStoreRepo.getTemperatureUnit()
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
         }
+        return Triple(language, temperatureUnit, windUnit)
     }
 
 
@@ -125,10 +126,8 @@ class CurrentWeatherViewModelImp(
 
 
 class HomeViewModelFactory(
-    private val repo: WeatherRepository,
-    private val dataStoreRepo: DataStoreRepository
-) :
-    ViewModelProvider.Factory {
+    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CurrentWeatherViewModelImp(repo, dataStoreRepo) as T
     }
