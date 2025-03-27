@@ -1,4 +1,4 @@
-package com.example.skysync
+package com.example.skysync.helper
 
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

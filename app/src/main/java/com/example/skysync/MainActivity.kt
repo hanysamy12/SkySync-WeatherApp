@@ -43,6 +43,7 @@ import com.example.skysync.ui.navigation.BottomNavigationBar
 import com.example.skysync.ui.navigation.ScreenRoute
 import com.example.skysync.ui.theme.SkySyncTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -69,7 +70,7 @@ class MainActivity : ComponentActivity() {
         )[CurrentWeatherViewModelImp::class.java]
         val settingsViewModel = ViewModelProvider(
             this,
-            SettingsViewModelFactory(this.application)
+            SettingsViewModelFactory(dataStoreRepo)
         )[SettingsViewModelImp::class.java]
         setContent {
             SkySyncTheme {
@@ -81,7 +82,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     suspend fun changeLocal(dateStoreRepository: DataStoreRepository, context: Context) {
-        dateStoreRepository.getLanguage().collect {
+        dateStoreRepository.getLanguage().distinctUntilChanged().collect {
                 Log.i(TAG, "changeLocal: $it")
                 val locale = Locale(it)
                 Locale.setDefault(locale)
@@ -90,7 +91,8 @@ class MainActivity : ComponentActivity() {
                 config.setLayoutDirection(locale)
                 context.resources.updateConfiguration(config, context.resources.displayMetrics)
                 delay(600)
-               // recreate()
+          //  recreate()
+
 
             }
         }

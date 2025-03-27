@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.skysync.R
-import com.example.skysync.Response
+import com.example.skysync.helper.Response
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
@@ -428,13 +428,14 @@ private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
 
    // Log.i(TAG, "HourItem: $lang // $tempUnit")
     // var hour = "forecastList?.list"
-    var icon: Painter = painterResource(R.drawable.ic_settings)
+    var icon: Painter = painterResource(R.drawable.ic_sunrise)
     Column(
         modifier = Modifier
             //.width(60.dp)
             //  .fillMaxHeight(0.10f),
             .height(120.dp)
             .padding(8.dp),
+
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
