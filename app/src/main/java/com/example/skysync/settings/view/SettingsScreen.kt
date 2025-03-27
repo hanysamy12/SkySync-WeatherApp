@@ -30,7 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.skysync.Constants
+import com.example.skysync.helper.Constants
 import com.example.skysync.R
 import com.example.skysync.settings.viewmodel.SettingsViewModel
 

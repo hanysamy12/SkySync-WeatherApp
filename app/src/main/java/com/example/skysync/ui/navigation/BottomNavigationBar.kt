@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.skysync.R
@@ -37,13 +38,13 @@ sealed class ScreenRoute(val route: String) {
 fun BottomNavigationBar(navController: NavController) {
 
     val navigationItems = listOf(
-        NavigationItem("Home", painterResource(R.drawable.ic_home), ScreenRoute.Home.route),
+        NavigationItem(stringResource(R.string.home), painterResource(R.drawable.ic_home), ScreenRoute.Home.route),
         NavigationItem(
-            "Favorite", painterResource(R.drawable.ic_heart), ScreenRoute.Favorite.route
+            stringResource(R.string.favorite), painterResource(R.drawable.ic_heart), ScreenRoute.Favorite.route
         ),
-        NavigationItem("Alerts", painterResource(R.drawable.ic_bellring), ScreenRoute.Alerts.route),
+        NavigationItem(stringResource(R.string.alerts), painterResource(R.drawable.ic_bellring), ScreenRoute.Alerts.route),
         NavigationItem(
-            "Settings", painterResource(R.drawable.ic_settings), ScreenRoute.Settings.route
+            stringResource(R.string.settings), painterResource(R.drawable.ic_settings), ScreenRoute.Settings.route
         )
     )
     val selectedNavigationIndex = rememberSaveable { mutableIntStateOf(0) }
@@ -68,7 +69,6 @@ fun BottomNavigationBar(navController: NavController) {
                 if (index == selectedNavigationIndex.intValue) {
                     Text(
                         item.title
-
                     )
                 }
             })

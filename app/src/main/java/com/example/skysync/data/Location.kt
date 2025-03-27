@@ -11,7 +11,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.example.skysync.Constants
+import com.example.skysync.helper.Constants
 import com.example.skysync.repo.DataStoreRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback

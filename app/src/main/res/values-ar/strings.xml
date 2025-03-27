@@ -24,4 +24,8 @@
     <string name="percentage_sign">٪</string>
     <string name="pressure">الضغط</string>
     <string name="cloud">الغيوم</string>
+    <string name="home">الرئيسية</string>
+    <string name="alerts">تنبيهات</string>
+    <string name="settings">الإعدادات</string>
+    <string name="favorite">المفضلة</string>
 </resources>
