@@ -28,4 +28,7 @@
     <string name="alerts">تنبيهات</string>
     <string name="settings">الإعدادات</string>
     <string name="favorite">المفضلة</string>
+    <string name="Wainting_message">Prepending Every Thing For You</string>
+    <string name="no_location_selected">No Location Selected</string>
+    <string name="add_to_favorite">Add To Favorite</string>
 </resources>

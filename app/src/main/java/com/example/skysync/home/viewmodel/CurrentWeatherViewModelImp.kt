@@ -13,6 +13,7 @@ import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.DataStoreRepository
 import com.example.skysync.repo.WeatherRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -75,7 +76,6 @@ class CurrentWeatherViewModelImp(
                 language = dataStoreRepo.getLanguage().first()
                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
                 windUnit = dataStoreRepo.getWindUnit()
-
                 dataStoreRepo.getLatLongFromDataStore().first().let { (lat, lon) ->
                     if (lat != null && lon != null) {
                         getCurrentWeather(lat, lon, language, temperatureUnit)
@@ -93,14 +93,39 @@ class CurrentWeatherViewModelImp(
         return Triple(language, temperatureUnit, windUnit)
     }
 
+    override fun loadFavoriteInitialValues(
+        lat: Double,
+        lon: Double
+    ): Triple<String, String, String> {
+        viewModelScope.launch {
+            try {
+                language = dataStoreRepo.getLanguage().first()
+                temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                windUnit = dataStoreRepo.getWindUnit()
+                getCurrentWeather(lat, lon, language, temperatureUnit)
+                getForecast(lat, lon, language, temperatureUnit)
+            } catch (e: Exception) {
+                mutableMessage.value = Response.Failure(e)
+            }
+        }
+        return Triple(language, temperatureUnit, windUnit)
 
-    private suspend fun getCurrentWeather(lat: Long, lon: Long, language: String, unit: String) {
-        Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit//////")
+    }
+
+
+    private suspend fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        language: String,
+        unit: String
+    ) {
+        Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit/ $lat/ $lon////")
 
         try {
             repo.getCurrentWeather(lat, lon, language, unit)
                 .catch { error -> mutableWeather.value = Response.Failure(error) }
                 .collect { weather ->
+                    delay(200)
                     mutableWeather.value = Response.Success(weather)
                 }
         } catch (e: Exception) {
@@ -109,7 +134,7 @@ class CurrentWeatherViewModelImp(
         }
     }
 
-    private suspend fun getForecast(lat: Long, lon: Long, language: String, unit: String) {
+    private suspend fun getForecast(lat: Double, lon: Double, language: String, unit: String) {
 
         try {
             repo.getForecast(lat, lon, language, unit)

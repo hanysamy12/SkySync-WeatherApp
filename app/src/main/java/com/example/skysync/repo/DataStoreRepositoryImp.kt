@@ -21,14 +21,14 @@ val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(Co
 class DataStoreRepositoryImp(val application: Application) : DataStoreRepository {
     override suspend fun addLatLongToSharedPref(lat: Double, lon: Double) {
         application.locationDataStore.edit { pref ->
-            pref[Constants.CURRENT_LAT_KEY] = lat.toLong()
-            pref[Constants.CURRENT_LON_KEY] = lon.toLong()
+            pref[Constants.CURRENT_LAT_KEY] = lat
+            pref[Constants.CURRENT_LON_KEY] = lon
         }
     }
 
 
 
-    override fun getLatLongFromDataStore(): Flow<Pair<Long?, Long?>> {
+    override fun getLatLongFromDataStore(): Flow<Pair<Double?, Double?>> {
         return application.locationDataStore.data.map { pref ->
             val lat = pref[Constants.CURRENT_LAT_KEY]
             val lon = pref[Constants.CURRENT_LON_KEY]

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.flowOf
 class WeatherRemoteDataSourceImp private constructor(val service: ApiService) :
     WeatherRemoteDataSource {
     override suspend fun getCurrentWeather(
-        lat: Long?,
-        lon: Long?,
+        lat: Double?,
+        lon: Double?,
         language: String,
         unit: String
     ): Flow<CurrentWeatherResponse> {
@@ -18,8 +18,8 @@ class WeatherRemoteDataSourceImp private constructor(val service: ApiService) :
     }
 
     override suspend fun getForecast(
-        lat: Long?,
-        lon: Long?,
+        lat: Double?,
+        lon: Double?,
         language: String,
         unit: String
     ): Flow<ForecastWeatherResponse >{

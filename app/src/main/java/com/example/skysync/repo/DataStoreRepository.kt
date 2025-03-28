@@ -3,8 +3,8 @@ package com.example.skysync.repo
 import kotlinx.coroutines.flow.Flow
 
 interface DataStoreRepository {
+    fun getLatLongFromDataStore(): Flow<Pair<Double?, Double?>>
     suspend fun addLatLongToSharedPref(lat: Double, lon: Double)
-    fun getLatLongFromDataStore(): Flow<Pair<Long?, Long?>>
     suspend fun setLanguage(language: String)
     suspend fun getLanguage(): Flow<String>
     suspend fun saveLocationWay(locationWay: String)
@@ -13,5 +13,6 @@ interface DataStoreRepository {
     suspend fun saveWindUnit(unit: String)
     suspend fun getWindUnit(): String
     suspend fun getSettings(): Map<String, String>
+
 
 }

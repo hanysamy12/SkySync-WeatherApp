@@ -19,8 +19,8 @@ object RetrofitHelper {
 interface ApiService {
     @GET("weather")
     suspend fun getCurrentWeather(
-        @Query("lat") lat: Long?,
-        @Query("lon") lon: Long?,
+        @Query("lat") lat: Double?,
+        @Query("lon") lon: Double?,
         @Query("appid") appId: String = "4d8ffcfda7b01ee2b930a3cd193273e4",
         @Query("lang") language: String = "en",
         @Query("units") unit: String
@@ -28,8 +28,8 @@ interface ApiService {
 
     @GET("forecast")
     suspend fun getForecast(
-        @Query("lat") lat: Long?,
-        @Query("lon") lon: Long?,
+        @Query("lat") lat: Double?,
+        @Query("lon") lon: Double?,
         @Query("appid") appId: String = "4d8ffcfda7b01ee2b930a3cd193273e4",
         @Query("lang") language: String = "en",
         @Query("units") unit: String

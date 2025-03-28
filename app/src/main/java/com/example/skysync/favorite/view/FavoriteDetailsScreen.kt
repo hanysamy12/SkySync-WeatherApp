@@ -1,4 +1,4 @@
-package com.example.skysync.home.view
+package com.example.skysync.favorite.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -42,9 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.skysync.R
-import com.example.skysync.favorite.view.MessageShow
-import com.example.skysync.favorite.view.ProgressShow
-import com.example.skysync.favorite.view.numEnToAr
 import com.example.skysync.helper.Response
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.models.CurrentWeatherResponse
@@ -60,7 +57,7 @@ import java.util.Locale
 //@Preview()
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
+fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon: Double) {
     val fahrenheitSymbol = stringResource(R.string.fahrenheit_symbol)
     val celsiusSymbol = stringResource(R.string.celsius_symbol)
     val kelvinSymbol = stringResource(R.string.kelvin_symbol)
@@ -70,8 +67,8 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     var lang = rememberSaveable { mutableStateOf("") }
     var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
     var windUnit = rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues()
+    LaunchedEffect(lat,lon) {
+        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadFavoriteInitialValues(lat,lon)
         lang.value = language
         windUnit.value = when (windSpeedUnit) {
             "mile" -> mileSymbol

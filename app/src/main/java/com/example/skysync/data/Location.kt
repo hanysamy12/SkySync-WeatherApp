@@ -97,11 +97,9 @@ class Location(private val activity: Activity,private val dataStoreRepository: D
                     Log.i(
                         TAG, "onLocationResult longitude: ------ ${location.locations[0].longitude}"
                     )
-                    CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
+                    CoroutineScope(Dispatchers.IO + SupervisorJob()/**/).launch {
                         addLatLongToSharedPref(location.locations[0].latitude, location.locations[0].longitude) // Pass as Double, NOT Long
                     }
-
-
                    /* locationState.value =
                         location.lastLocation ?: Location(LocationManager.GPS_PROVIDER)
                     getGeoLocation(location.locations[0].latitude, location.locations[0].longitude)*/
