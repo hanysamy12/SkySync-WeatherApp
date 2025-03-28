@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -41,10 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.skysync.R
-import com.example.skysync.favorite.view.MessageShow
-import com.example.skysync.favorite.view.ProgressShow
-import com.example.skysync.favorite.view.numEnToAr
 import com.example.skysync.helper.Response
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.models.CurrentWeatherResponse
@@ -174,7 +175,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun CurrentWeatherShow(
+ fun CurrentWeatherShow(
     currentWeather: CurrentWeatherResponse?,
     lang: String,
     tempUnit: String,
@@ -442,8 +443,7 @@ private fun CurrentWeatherShow(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUnit: String) {
-
+fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUnit: String) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyRow(
@@ -463,9 +463,10 @@ private fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUn
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
+fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
 
     // Log.i(TAG, "HourItem: $lang // $tempUnit")
     // var hour = "forecastList?.list"
@@ -482,12 +483,20 @@ private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
     ) {
         val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0, lang)
         Text(hour.second, fontSize = 14.sp)
-        Icon(
+        GlideImage(
+            model = "https://openweathermap.org/img/wn/${hourItem?.weather?.firstOrNull()?.icon ?: "01d"}@2x.png",
+            contentDescription = "Product Image",
+            modifier = Modifier
+                .size(40.dp)
+            , colorFilter = null
+
+            )
+ /*       Icon(
             icon,
             contentDescription = "icon description",
             modifier = Modifier.size(20.dp),
             tint = Color.Unspecified
-        )
+        )*/
         Row(
             // modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -504,9 +513,10 @@ private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
+fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
     // Log.i(TAG, "DaysItem: $dayItem ////////////////////////////")
 
 
@@ -531,11 +541,20 @@ private fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
             Text(day.first, fontSize = 16.sp)
             // Text("${dayItem?.weather?.get(0)?.main}", fontSize = 20.sp)
         }
-        Icon(
+
+        GlideImage(
+            model = "https://openweathermap.org/img/wn/${dayItem?.weather?.firstOrNull()?.icon ?: "01d"}@2x.png",
+            contentDescription = "Product Image",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+            , colorFilter = null
+            )
+/*        Icon(
             painterResource(R.drawable.ic_sunrise),
             contentDescription = "icon desc",
             modifier = Modifier.size(26.dp), tint = Color.Unspecified
-        )
+        )*/
         Row(
             modifier = Modifier
                 //.weight(1f)
@@ -573,7 +592,6 @@ private fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
 
     }
 }
-
 @Composable
 fun ProgressShow() {
     Column(
@@ -601,9 +619,8 @@ fun MessageShow(message: String) {
         Text(message, color = Color.White)
     }
 }
-
 @RequiresApi(Build.VERSION_CODES.O)
-private fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
+ fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
     //  Log.i(TAG, "longDateTime: $local")
 
     val instance = Instant.ofEpochSecond(dateLong)

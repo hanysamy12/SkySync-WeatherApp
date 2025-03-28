@@ -83,7 +83,8 @@ dependencies {
     //DataStore
     //Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    //Proto DataStore
-   // implementation("androidx.datastore:datastore-core:1.1.3")
+    //glide
+    implementation(platform("androidx.compose:compose-bom:2025.02.00"))
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
 }

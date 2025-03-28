@@ -3,54 +3,31 @@ package com.example.skysync.favorite.view
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.skysync.R
 import com.example.skysync.helper.Response
+import com.example.skysync.home.view.CurrentWeatherShow
+import com.example.skysync.home.view.ForecastShow
+import com.example.skysync.home.view.MessageShow
+import com.example.skysync.home.view.ProgressShow
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
-import com.example.skysync.models.CurrentWeatherResponse
-import com.example.skysync.models.ForecastWeatherResponse
-import com.example.skysync.models.ListItem
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 //private const val TAG = "HomeScreen"
 
@@ -169,6 +146,7 @@ fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon:
 }
 
 
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CurrentWeatherShow(
@@ -361,13 +339,15 @@ private fun CurrentWeatherShow(
                         }
                     }
                 }
-                /*Box(
+                */
+/*Box(
                     modifier = Modifier
                         .fillMaxHeight()
                       //  .padding(5.dp)
                         .width(2.dp)
                         .background(colorResource(R.color.black))
-                )*/
+                )*//*
+
                 Column(
                     modifier = Modifier //right
                         .weight(1f)
@@ -459,173 +439,11 @@ private fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUn
         daysList?.forEach { day -> DaysItem(day, lang, temUnit) }
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-private fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
-
-    // Log.i(TAG, "HourItem: $lang // $tempUnit")
-    // var hour = "forecastList?.list"
-    var icon: Painter = painterResource(R.drawable.ic_sunrise)
-    Column(
-        modifier = Modifier
-            //.width(60.dp)
-            //  .fillMaxHeight(0.10f),
-            .height(120.dp)
-            .padding(8.dp),
-
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val hour = convertDateTime(hourItem?.dt?.toLong() ?: 0, lang)
-        Text(hour.second, fontSize = 14.sp)
-        Icon(
-            icon,
-            contentDescription = "icon description",
-            modifier = Modifier.size(20.dp),
-            tint = Color.Unspecified
-        )
-        Row(
-            // modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Top
-        ) {
-            val temp = if (lang == "ar") {
-                numEnToAr(hourItem?.main?.temp.toString())
-            } else {
-                hourItem?.main?.temp.toString()
-            }
-            Text(temp, fontSize = 14.sp)
-            Text(tempUnit, fontSize = 10.sp /*modifier = Modifier.padding(top = 12.dp)*/)
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-private fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
-    // Log.i(TAG, "DaysItem: $dayItem ////////////////////////////")
+*/
 
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .padding(vertical = 8.dp)
-            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        Row(
-            modifier = Modifier
-                //.weight(2f)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-            val day = convertDateTime(dayItem?.dt?.toLong() ?: 0, lang)
-            Text(day.first, fontSize = 16.sp)
-            // Text("${dayItem?.weather?.get(0)?.main}", fontSize = 20.sp)
-        }
-        Icon(
-            painterResource(R.drawable.ic_sunrise),
-            contentDescription = "icon desc",
-            modifier = Modifier.size(26.dp), tint = Color.Unspecified
-        )
-        Row(
-            modifier = Modifier
-                //.weight(1f)
-                .padding(horizontal = 12.dp), horizontalArrangement = Arrangement.End
-        ) {
-            Row(//max
-                // modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.Top
-            ) {
-                val temp = if (lang == "ar") {
-                    numEnToAr(dayItem?.main?.temp.toString())
-                } else {
-                    dayItem?.main?.temp.toString()
-                }
-                Text(temp, fontSize = 14.sp)
-                Text(temUnit, fontSize = 8.sp)
-            }
-            Text("/", fontSize = 20.sp)
-            Row(//min
-
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.Top
-            ) {
-                val temp = if (lang == "ar") {
-                    numEnToAr(dayItem?.main?.temp.toString())
-                } else {
-                    dayItem?.main?.temp.toString()
-                }
-                Text(temp, fontSize = 14.sp)
-                Text(temUnit, fontSize = 8.sp)
-            }
-        }
 
 
-    }
-}
 
-@Composable
-fun ProgressShow() {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.height(300.dp))
-        LinearProgressIndicator()
-        Text(stringResource(R.string.Wainting_message))
 
-    }
-}
-
-@Composable
-fun MessageShow(message: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .height(30.dp)
-            .background(Color.Gray),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(message, color = Color.White)
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-private fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
-    //  Log.i(TAG, "longDateTime: $local")
-
-    val instance = Instant.ofEpochSecond(dateLong)
-    val dateFormater =
-        DateTimeFormatter.ofPattern("EEE, dd MMM", Locale(lang))
-            .withZone(ZoneId.systemDefault())
-    var formatedDate = dateFormater.format(instance)
-    val timeFormatter =
-        DateTimeFormatter.ofPattern("hh:mm a", Locale(lang))
-            .withZone(ZoneId.systemDefault())
-    var formatedTime = timeFormatter.format(instance)
-    // Log.i(TAG, "converted DateTime: $formatedDate --- $formatedTime")
-    if (Locale(lang).language == "ar") {
-        formatedTime = numEnToAr(formatedTime)
-        formatedDate = numEnToAr(formatedDate)
-    }
-    return Pair(formatedDate, formatedTime)
-}
-
-fun numEnToAr(input: String): String {
-    val englishNumbers = Regex("[0-9]")
-    val arabicNumber = arrayOf("٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩")
-
-    return englishNumbers.replace(input) {
-        arabicNumber[it.value.toInt()]
-    }
-}
 

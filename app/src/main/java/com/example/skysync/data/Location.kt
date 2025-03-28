@@ -10,6 +10,10 @@ import android.location.LocationManager
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import com.example.skysync.helper.Constants
 import com.example.skysync.repo.DataStoreRepository
@@ -31,7 +35,7 @@ class Location(private val activity: Activity,private val dataStoreRepository: D
     /*private var stringAddress: MutableState<String> = mutableStateOf("")
     late init var locationState: MutableState<Location>*/
 
-    fun getLocation() {
+    suspend fun getLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
                 getFreshLocation()
@@ -81,8 +85,9 @@ class Location(private val activity: Activity,private val dataStoreRepository: D
         }
     }*/
     @SuppressLint("MissingPermission")
-    private fun getFreshLocation() {
-
+    private suspend fun getFreshLocation(): Pair<Double, Double> {
+    var lat by mutableDoubleStateOf(0.0)
+    var lon by mutableDoubleStateOf(0.0)
         fusedClient = LocationServices.getFusedLocationProviderClient(activity)
         fusedClient.requestLocationUpdates(
             LocationRequest.Builder(0)
@@ -90,15 +95,13 @@ class Location(private val activity: Activity,private val dataStoreRepository: D
                 .setWaitForAccurateLocation(true).build(),
             object : LocationCallback() {
                 override fun onLocationResult(location: LocationResult) {
+                     lat = location.locations[0].latitude
+                     lon = location.locations[0].longitude
                     super.onLocationResult(location)
-                    Log.i(
-                        TAG, "onLocationResult latitude: ------ ${location.locations[0].latitude}"
-                    )
-                    Log.i(
-                        TAG, "onLocationResult longitude: ------ ${location.locations[0].longitude}"
-                    )
+                    Log.i(TAG, "onLocationResult latitude: ------ $lat")
+                    Log.i(TAG, "onLocationResult longitude: ------ $location")
                     CoroutineScope(Dispatchers.IO + SupervisorJob()/**/).launch {
-                        addLatLongToSharedPref(location.locations[0].latitude, location.locations[0].longitude) // Pass as Double, NOT Long
+                        addLatLongToSharedPref(lat, lon) // Pass as Double, NOT Long
                     }
                    /* locationState.value =
                         location.lastLocation ?: Location(LocationManager.GPS_PROVIDER)
@@ -107,7 +110,10 @@ class Location(private val activity: Activity,private val dataStoreRepository: D
             },
             Looper.myLooper()
         )
+    return Pair(lat,lon)
     }
+
+
     private fun enableLocationService() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         activity.startActivity(intent)

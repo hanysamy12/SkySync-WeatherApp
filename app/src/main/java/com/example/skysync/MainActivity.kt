@@ -62,7 +62,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val dataStoreRepo = DataStoreRepositoryImp(this.application)
-        Location(this, dataStoreRepo).getLocation()
+        lifecycleScope.launch { Location(this@MainActivity, dataStoreRepo).getLocation() }
+
         lifecycleScope.launch {
             changeLocal(dataStoreRepo, this@MainActivity)
         }
