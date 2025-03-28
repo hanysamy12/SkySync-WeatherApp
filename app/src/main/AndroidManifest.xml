@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SkySync"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCqo_QX9ba5nDHrptSqIS0tqtYw06tWDSw" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

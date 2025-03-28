@@ -18,6 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+       // manifestPlaceholders=[MAPS_API_KEY: MAPS_API_KEY]
     }
 
     buildTypes {
@@ -86,5 +88,11 @@ dependencies {
     //glide
     implementation(platform("androidx.compose:compose-bom:2025.02.00"))
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    //Google maps
+    implementation("com.google.maps.android:maps-compose:2.14.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    //Google maps Search
+    implementation("com.google.android.libraries.places:places:4.2.0")
 
 }

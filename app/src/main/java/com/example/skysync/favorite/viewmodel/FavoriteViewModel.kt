@@ -1,9 +1,10 @@
 package com.example.skysync.favorite.viewmodel
 
 import com.example.skysync.models.StoredLocation
+import com.google.android.gms.maps.model.LatLng
 
 interface FavoriteViewModel {
-    fun addFavoriteLocation(storedLocation: StoredLocation)
+    suspend fun addFavoriteLocation(latLng: LatLng?)
     fun deleteFavoriteLocation(storedLocation: StoredLocation)
     suspend fun getAllFavoriteLocations()
 }

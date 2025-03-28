@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +50,7 @@ fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController
                 val msg = (uiFavoriteState as Response.Failure).toString()
                 MessageShow(msg)
             }
+
             is Response.Success<*> -> {
                 val favoriteList = (uiFavoriteState as Response.Success).data
                 FavoriteList(favoriteList) { lat, lon ->
@@ -77,11 +79,19 @@ private fun FavoriteList(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(locationsList.size ) {
+        item {
+            Text(stringResource(R.string.favorite), fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
+        }
+        items(locationsList.size) {
             val currentLocation = locationsList[it]
             FavoriteItem(
                 currentLocation,
-                onFavClicked = {onFavClicked(currentLocation.lat?:0.0,currentLocation.lon?:0.0)})
+                onFavClicked = {
+                    onFavClicked(
+                        currentLocation.lat ?: 0.0,
+                        currentLocation.lon ?: 0.0
+                    )
+                })
         }
     }
 }
@@ -99,11 +109,19 @@ private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit) {
             .clickable {
                 onFavClicked()
             },
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(location?.name.toString(), fontSize = 20.sp)
-        Text("Egypt, fayoum", fontSize = 16.sp)
-        Icon(painter = painterResource(R.drawable.ic_right_arrow), contentDescription = "Delete")
+        Text(
+            location?.name.toString(),
+            fontSize = 20.sp,
+            modifier = Modifier.padding(start = 12.dp)
+        )
+        ///Text("Egypt, fayoum", fontSize = 16.sp)
+        Icon(
+            painter = painterResource(R.drawable.ic_delete),
+            contentDescription = "Delete",
+            modifier = Modifier.padding(end = 12.dp)
+        )
     }
 }

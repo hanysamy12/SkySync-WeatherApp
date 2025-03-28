@@ -62,7 +62,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val dataStoreRepo = DataStoreRepositoryImp(this.application)
-        lifecycleScope.launch { Location(this@MainActivity, dataStoreRepo).getLocation() }
+        val location=Location(this@MainActivity, dataStoreRepo)
+        lifecycleScope.launch { location.getLocation() 
+        val sLocation = location.getGeoLocation(29.777,30.65)
+            Log.d(TAG, "onCreate: GeoLocation $sLocation/////////")
+        }
 
         lifecycleScope.launch {
             changeLocal(dataStoreRepo, this@MainActivity)
@@ -88,7 +92,7 @@ class MainActivity : ComponentActivity() {
                 WeatherRepositoryImp(
                     WeatherRemoteDataSourceImp.getInstance(),
                     WeatherLocalDataSourceImp.getInstance(this.applicationContext)
-                )
+                ),location
             )
         )[FavoriteViewModelImp::class.java]
         setContent {
