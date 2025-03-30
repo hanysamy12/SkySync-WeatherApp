@@ -103,7 +103,7 @@ class Location(
 
 
             fusedClient.requestLocationUpdates(
-                LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0)
+                LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 0)
                     .setWaitForAccurateLocation(true)
                     .build(),
                 locationCallback,

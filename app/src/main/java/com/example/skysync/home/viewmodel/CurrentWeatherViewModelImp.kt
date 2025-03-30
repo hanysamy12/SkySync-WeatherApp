@@ -24,7 +24,9 @@ import kotlinx.coroutines.launch
 private const val TAG = "CurrentWeatherViewModel"
 
 class CurrentWeatherViewModelImp(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository ,private val location: Location
+    private val repo: WeatherRepository,
+    private val dataStoreRepo: DataStoreRepository,
+    private val location: Location
 ) : CurrentWeatherViewModel, ViewModel() {
 
     private val mutableWeather =
@@ -76,11 +78,12 @@ class CurrentWeatherViewModelImp(
         mutableForecast.value = Response.Loading
         viewModelScope.launch {
             try {
+
                 language = dataStoreRepo.getLanguage().first()
                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
                 windUnit = dataStoreRepo.getWindUnit()
 
-                    location.getLocation().let { (lat, lon) ->
+                location.getLocation().let { (lat, lon) ->
                     if (lat != null && lon != null) {
                         getCurrentWeather(lat, lon, language, temperatureUnit)
                         getForecast(lat, lon, language, temperatureUnit)
@@ -157,9 +160,11 @@ class CurrentWeatherViewModelImp(
 
 
 class HomeViewModelFactory(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository,private val location: Location
+    private val repo: WeatherRepository,
+    private val dataStoreRepo: DataStoreRepository,
+    private val location: Location
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CurrentWeatherViewModelImp(repo, dataStoreRepo,location) as T
+        return CurrentWeatherViewModelImp(repo, dataStoreRepo, location) as T
     }
 }

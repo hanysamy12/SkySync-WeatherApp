@@ -12,7 +12,6 @@ import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
-import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.After
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -82,7 +81,7 @@ class MyNotifications(private val context: Context) {
     }
 
 
-}
+
 
 object PermissionHelper {
     fun checkNotificationPermission(activity: Activity) {
@@ -101,4 +100,4 @@ object PermissionHelper {
     }
 
 
-}
+}}

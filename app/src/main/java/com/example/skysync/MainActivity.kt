@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -28,9 +27,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.skysync.alerts.view.AlertsScreen
+import com.example.skysync.alerts.viewmodel.AlertViewModelFactory
+import com.example.skysync.alerts.viewmodel.AlertViewModelImp
 import com.example.skysync.data.Location
 import com.example.skysync.data.local.WeatherLocalDataSourceImp
 import com.example.skysync.data.remote.WeatherRemoteDataSourceImp
@@ -40,8 +40,9 @@ import com.example.skysync.favorite.view.MapScreen
 import com.example.skysync.favorite.viewmodel.FavoriteViewModelImp
 import com.example.skysync.favorite.viewmodel.FavoriteViwModelFactory
 import com.example.skysync.helper.Constants
+import com.example.skysync.helper.MyNotifications
+import com.example.skysync.helper.MyNotifications.PermissionHelper
 import com.example.skysync.helper.MyWorkManager
-import com.example.skysync.helper.PermissionHelper
 import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
@@ -58,7 +59,6 @@ import com.example.skysync.ui.theme.SkySyncTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import java.io.IOException
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -71,13 +71,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //////////
-       // PermissionHelper.checkNotificationPermission(this)
+     //   PermissionHelper.checkNotificationPermission(this)
         ////////
-        val workManager = WorkManager.getInstance(this@MainActivity)
+/*        val workManager = WorkManager.getInstance(this@MainActivity)
         val request =
             OneTimeWorkRequestBuilder<MyWorkManager>().addTag(Constants.MY_WORK_MANAGER_TAG)
                 .setInitialDelay(10,TimeUnit.SECONDS).build()
-        workManager.enqueue(request)
+        workManager.enqueue(request)*/
         /*  workManager.getWorkInfoByIdLiveData(request.id).observe(this, Observer { workInfo ->
               when (workInfo?.state) {
                   WorkInfo.State.SUCCEEDED -> {
@@ -123,9 +123,12 @@ class MainActivity : ComponentActivity() {
                 ), Location(this@MainActivity, DataStoreRepositoryImp(this.application))
             )
         )[FavoriteViewModelImp::class.java]
+
+        val alertViewModel = ViewModelProvider(this, AlertViewModelFactory(MyNotifications(this),
+            WorkManager.getInstance(this@MainActivity),this@MainActivity))[AlertViewModelImp::class.java]
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel, settingsViewModel, favoriteViewModel)
+                MainScreen(homeViewModel, settingsViewModel, favoriteViewModel,alertViewModel)
 
             }
 
@@ -154,7 +157,8 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(
     homeViewModel: CurrentWeatherViewModelImp,
     settingsViewModel: SettingsViewModel,
-    favoriteViewModel: FavoriteViewModelImp
+    favoriteViewModel: FavoriteViewModelImp,
+    alertViewModelImp: AlertViewModelImp
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -192,7 +196,7 @@ fun MainScreen(
                 FavoriteScreen(favoriteViewModel, navController)
             }
             composable(route = ScreenRoute.Alerts.route) {
-                AlertsScreen(navController)
+                AlertsScreen(alertViewModelImp)
             }
             composable(route = ScreenRoute.Settings.route) {
                 SettingsScreen(settingsViewModel)
