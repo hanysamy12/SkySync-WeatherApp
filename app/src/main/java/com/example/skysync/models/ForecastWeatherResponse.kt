@@ -31,7 +31,7 @@ data class Sys(
 
 data class ListItem(
 	val dt: Int? = null,
-	val pop: Int? = null,
+	val pop: Double? = null,///
 	val visibility: Int? = null,
 	val dtTxt: String? = null,
 	val weather: List<WeatherItem?>? = null,

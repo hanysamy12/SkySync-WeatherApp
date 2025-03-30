@@ -32,6 +32,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 private const val TAG = "Location"
@@ -40,24 +41,23 @@ class Location(
     private val activity: Activity,
     private val dataStoreRepository: DataStoreRepository
 ) {
-    private lateinit var fusedClient: FusedLocationProviderClient
 
 
-    suspend fun getLocation() {
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                getFreshLocation()
-            } else {
-                enableLocationService()
-            }
-        } else {
-            ActivityCompat.requestPermissions(
-                activity, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ), Constants.REQUEST_PERMEATION_CODE
-            )
-        }
+    suspend fun getLocation() : Pair<Double, Double> {
+      return (if (checkPermissions()) {
+          if (isLocationEnabled()) {
+              getFreshLocation()
+          } else {
+              enableLocationService()
+          }
+      } else {
+          ActivityCompat.requestPermissions(
+              activity, arrayOf(
+                  Manifest.permission.ACCESS_FINE_LOCATION,
+                  Manifest.permission.ACCESS_COARSE_LOCATION
+              ), Constants.REQUEST_PERMEATION_CODE
+          )
+      }) as Pair<Double, Double>
     }
 
     private fun checkPermissions(): Boolean {
@@ -82,36 +82,42 @@ class Location(
     }
 
     @SuppressLint("MissingPermission")
-    private suspend fun getFreshLocation(): Pair<Double, Double> {
-        var lat by mutableDoubleStateOf(0.0)
-        var lon by mutableDoubleStateOf(0.0)
-        fusedClient = LocationServices.getFusedLocationProviderClient(activity)
-        fusedClient.requestLocationUpdates(
-            LocationRequest.Builder(0)
-                .apply { setPriority(Priority.PRIORITY_HIGH_ACCURACY) }.setIntervalMillis(100000)
-                .setWaitForAccurateLocation(true).build(),
-            object : LocationCallback() {
-                override fun onLocationResult(location: LocationResult) {
-                    lat = location.locations[0].latitude
-                    lon = location.locations[0].longitude
-                    super.onLocationResult(location)
-                    Log.i(TAG, "onLocationResult latitude: ------ $lat")
-                    Log.i(TAG, "onLocationResult longitude: ------ $location")
-                    CoroutineScope(Dispatchers.IO + SupervisorJob()/**/).launch {
-                        addLatLongToSharedPref(lat, lon) // Pass as Double, NOT Long
-                    }
+    private suspend fun getFreshLocation(): Pair<Double, Double> = withContext(Dispatchers.IO) {
+        val fusedClient = LocationServices.getFusedLocationProviderClient(activity)
 
+        suspendCoroutine { continuation ->
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    fusedClient.removeLocationUpdates(this)
+                    val location = locationResult.lastLocation ?: run {
+                        continuation.resumeWithException(Exception("Null location received"))
+                        return
+                    }
+                    launch {
+                        addLatLongToSharedPref(location.latitude, location.longitude)
+                    }
+                    continuation.resume(Pair(location.latitude, location.longitude))
+                    Log.i(TAG, "onLocationResult: $location")
                 }
-            },
-            Looper.myLooper()
-        )
-        return Pair(lat, lon)
+            }
+
+
+            fusedClient.requestLocationUpdates(
+                LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0)
+                    .setWaitForAccurateLocation(true)
+                    .build(),
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
     }
 
 
-    private fun enableLocationService() {
+
+    private suspend fun enableLocationService() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         activity.startActivity(intent)
+        getLocation() ////////
     }
 
     private suspend fun addLatLongToSharedPref(lat: Double, lon: Double) {
@@ -123,7 +129,7 @@ class Location(
     ) {
         var geoCode = Geocoder(activity)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return@withContext suspendCoroutine {cont->
+            return@withContext suspendCoroutine { cont ->
                 geoCode.getFromLocation(latitude, longitude, 1, object : GeocodeListener {
                     override fun onGeocode(p0: MutableList<Address>) {
                         cont.resume(p0[0].countryName /*+ ", " + p0[0].adminArea*/)
@@ -132,7 +138,7 @@ class Location(
 
                 })
             }
-        }else {
+        } else {
             val addresses = geoCode.getFromLocation(latitude, longitude, 1)
             return@withContext "${addresses?.get(0)?.countryName}"/*, ${addresses?.get(0)?.adminArea}*/
         }

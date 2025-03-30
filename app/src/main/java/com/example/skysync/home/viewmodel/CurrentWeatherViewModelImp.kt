@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.skysync.data.Location
 import com.example.skysync.helper.Response
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "CurrentWeatherViewModel"
 
 class CurrentWeatherViewModelImp(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository ,private val location: Location
 ) : CurrentWeatherViewModel, ViewModel() {
 
     private val mutableWeather =
@@ -71,16 +72,19 @@ class CurrentWeatherViewModelImp(
     // Kelvin use units=standard
 
     override fun loadInitialValues(): Triple<String, String, String> {
+        mutableWeather.value = Response.Loading
+        mutableForecast.value = Response.Loading
         viewModelScope.launch {
             try {
                 language = dataStoreRepo.getLanguage().first()
                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
                 windUnit = dataStoreRepo.getWindUnit()
-                dataStoreRepo.getLatLongFromDataStore().first().let { (lat, lon) ->
+
+                    location.getLocation().let { (lat, lon) ->
                     if (lat != null && lon != null) {
                         getCurrentWeather(lat, lon, language, temperatureUnit)
                         getForecast(lat, lon, language, temperatureUnit)
-
+                        Log.i(TAG, "loadInitialValues: $lat ,, $lon ????")
                     } else {
                         mutableMessage.value = Response.Failure(Exception("Location Not Enabled"))
                     }
@@ -97,6 +101,8 @@ class CurrentWeatherViewModelImp(
         lat: Double,
         lon: Double
     ): Triple<String, String, String> {
+        mutableWeather.value = Response.Loading
+        mutableForecast.value = Response.Loading
         viewModelScope.launch {
             try {
                 language = dataStoreRepo.getLanguage().first()
@@ -151,9 +157,9 @@ class CurrentWeatherViewModelImp(
 
 
 class HomeViewModelFactory(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository,private val location: Location
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CurrentWeatherViewModelImp(repo, dataStoreRepo) as T
+        return CurrentWeatherViewModelImp(repo, dataStoreRepo,location) as T
     }
 }

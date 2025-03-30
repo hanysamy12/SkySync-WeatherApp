@@ -1,5 +1,6 @@
 package com.example.skysync.favorite.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -14,8 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
+private const val TAG = "FavoriteViewModelImp"
 class FavoriteViewModelImp(private val weatherRepository: WeatherRepository,private val location: Location) : ViewModel(),
     FavoriteViewModel {
+        
     private val mutableFavoriteList =
         MutableStateFlow<Response<List<StoredLocation>>>(Response.Loading)
     val favoriteList: StateFlow<Response<List<StoredLocation>>> = mutableFavoriteList
@@ -23,6 +26,7 @@ class FavoriteViewModelImp(private val weatherRepository: WeatherRepository,priv
     override suspend fun addFavoriteLocation(latLng: LatLng?) {
         val locationName =location.getGeoLocation(latLng?.latitude?:0.0,latLng?.longitude?:0.0)
         val storedLocation = StoredLocation(lat = latLng?.latitude, lon = latLng?.longitude, name = locationName)
+        Log.i(TAG, "addFavoriteLocation: $storedLocation")
         viewModelScope.launch {
             weatherRepository.adNewFavoriteLocations(storedLocation)
         }

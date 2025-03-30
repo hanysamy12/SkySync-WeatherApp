@@ -1,15 +1,18 @@
 package com.example.skysync.favorite.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -35,10 +38,12 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
+private const val TAG = "MapScreen"
 @Composable
 fun MapScreen(viewModel: FavoriteViewModel, navController: NavController) {
     var lat by remember { mutableDoubleStateOf(29.394835) }
     var lon by remember { mutableDoubleStateOf(30.902915) }
+    var searchQuery by remember { mutableStateOf("") }
     val cameraPositionState = rememberCameraPositionState()
     var clickedPosition by remember { mutableStateOf<LatLng?>(null) }
     var buttonEnabled by remember { mutableStateOf(false) }
@@ -75,11 +80,13 @@ fun MapScreen(viewModel: FavoriteViewModel, navController: NavController) {
 
         }
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxSize().padding(10.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            /*TextField(value = searchQuery , onValueChange = {query -> searchQuery = query
+                Log.i(TAG, "MapScreen: $query")})*/
             ElevatedButton(
                 onClick = {
                     coroutineScope.launch {viewModel.addFavoriteLocation(clickedPosition) }
@@ -137,7 +144,7 @@ private fun ShowChosenLocation(latLng: LatLng, onAddClick: () -> Unit) {
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = Color.White
             ),
-            //  contentPadding = TODO(),
+            //  contentPadding =
 
         ) {
             Text(stringResource(R.string.add_to_favorite), Modifier.background(Color.Transparent))

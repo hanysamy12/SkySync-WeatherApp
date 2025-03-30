@@ -22,7 +22,10 @@ class Constants {
         const val SETTINGS_TEMP = "temp_settings"
         const val SETTINGS_WIND = "wind_settings"
 
-
+        //work manager
+        const val MY_WORK_MANAGER_TAG = "notification_work_manager"
+        const val CHANNEL_ID ="notification_channel_id"
+        const val REQUEST_CODE_NOTIFICATION_PERMISSION = 1000
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,14 +54,14 @@ fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController
 
             is Response.Success<*> -> {
                 val favoriteList = (uiFavoriteState as Response.Success).data
-                FavoriteList(favoriteList) { lat, lon ->
+                FavoriteList(locationsList = favoriteList , onFavClicked = { lat, lon ->
                     navController.navigate(
                         ScreenRoute.FavoriteDetails(
                             lat,
                             lon
                         )
                     )
-                }
+                }, onDeleteClicked = {location -> viewModel.deleteFavoriteLocation(location)})
             }
         }
 
@@ -70,7 +71,8 @@ fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController
 @Composable
 private fun FavoriteList(
     locationsList: List<StoredLocation>,
-    onFavClicked: (lat: Double, lon: Double) -> Unit
+    onFavClicked: (lat: Double, lon: Double) -> Unit,
+    onDeleteClicked : (StoredLocation) -> Unit
 ) {
     LazyColumn(
         Modifier
@@ -91,13 +93,13 @@ private fun FavoriteList(
                         currentLocation.lat ?: 0.0,
                         currentLocation.lon ?: 0.0
                     )
-                })
+                }, onDeleteClicked = {onDeleteClicked(currentLocation)})
         }
     }
 }
 
 @Composable
-private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit) {
+private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit,onDeleteClicked: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -117,11 +119,13 @@ private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit) {
             fontSize = 20.sp,
             modifier = Modifier.padding(start = 12.dp)
         )
-        ///Text("Egypt, fayoum", fontSize = 16.sp)
-        Icon(
-            painter = painterResource(R.drawable.ic_delete),
+        ///Text("Egypt, cairo", fontSize = 16.sp)
+        IconButton(
+            onClick = {onDeleteClicked()},
+        ){ Icon(painter = painterResource(R.drawable.ic_delete),
             contentDescription = "Delete",
-            modifier = Modifier.padding(end = 12.dp)
-        )
+            modifier = Modifier.padding(end = 12.dp))}/*(
+
+        )*/
     }
 }

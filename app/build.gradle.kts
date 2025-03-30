@@ -94,5 +94,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     //Google maps Search
     //implementation("com.google.android.libraries.places:places:4.2.0")
+    val work_version = "2.10.0"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 
 }

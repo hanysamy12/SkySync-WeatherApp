@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.example.skysync.alerts.view.AlertsScreen
 import com.example.skysync.data.Location
 import com.example.skysync.data.local.WeatherLocalDataSourceImp
@@ -35,6 +39,9 @@ import com.example.skysync.favorite.view.FavoriteScreen
 import com.example.skysync.favorite.view.MapScreen
 import com.example.skysync.favorite.viewmodel.FavoriteViewModelImp
 import com.example.skysync.favorite.viewmodel.FavoriteViwModelFactory
+import com.example.skysync.helper.Constants
+import com.example.skysync.helper.MyWorkManager
+import com.example.skysync.helper.PermissionHelper
 import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
@@ -51,7 +58,9 @@ import com.example.skysync.ui.theme.SkySyncTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "MainActivity"
 
@@ -61,13 +70,32 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dataStoreRepo = DataStoreRepositoryImp(this.application)
-        val location=Location(this@MainActivity, dataStoreRepo)
-        lifecycleScope.launch { location.getLocation() 
-        val sLocation = location.getGeoLocation(29.777,30.65)
-            Log.d(TAG, "onCreate: GeoLocation $sLocation/////////")
-        }
+        //////////
+       // PermissionHelper.checkNotificationPermission(this)
+        ////////
+        val workManager = WorkManager.getInstance(this@MainActivity)
+        val request =
+            OneTimeWorkRequestBuilder<MyWorkManager>().addTag(Constants.MY_WORK_MANAGER_TAG)
+                .setInitialDelay(10,TimeUnit.SECONDS).build()
+        workManager.enqueue(request)
+        /*  workManager.getWorkInfoByIdLiveData(request.id).observe(this, Observer { workInfo ->
+              when (workInfo?.state) {
+                  WorkInfo.State.SUCCEEDED -> {
+                      Log.i(TAG, "Main Got : $workInfo")
+                      try {
 
+                      } catch (e: IOException) {
+                          Log.e(TAG, "Got From File Error: $e")
+                      }
+                  }
+                  else -> {
+                      Log.e(TAG, "Main Failed ${workInfo?.state}")
+                  }
+              }
+          })*/
+
+        ////////////
+        val dataStoreRepo = DataStoreRepositoryImp(this.application)
         lifecycleScope.launch {
             changeLocal(dataStoreRepo, this@MainActivity)
         }
@@ -77,27 +105,27 @@ class MainActivity : ComponentActivity() {
                 WeatherRepositoryImp(
                     WeatherRemoteDataSourceImp.getInstance(),
                     WeatherLocalDataSourceImp.getInstance(this.applicationContext)
-                ), dataStoreRepo
+                ),
+                DataStoreRepositoryImp(this.application),
+                Location(this@MainActivity, DataStoreRepositoryImp(this.application))
             )
         )[CurrentWeatherViewModelImp::class.java]
 
         val settingsViewModel = ViewModelProvider(
-            this,
-            SettingsViewModelFactory(dataStoreRepo)
+            this, SettingsViewModelFactory(DataStoreRepositoryImp(this.application))
         )[SettingsViewModelImp::class.java]
 
         val favoriteViewModel = ViewModelProvider(
-            this,
-            FavoriteViwModelFactory(
+            this, FavoriteViwModelFactory(
                 WeatherRepositoryImp(
                     WeatherRemoteDataSourceImp.getInstance(),
                     WeatherLocalDataSourceImp.getInstance(this.applicationContext)
-                ),location
+                ), Location(this@MainActivity, DataStoreRepositoryImp(this.application))
             )
         )[FavoriteViewModelImp::class.java]
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel, settingsViewModel,favoriteViewModel)
+                MainScreen(homeViewModel, settingsViewModel, favoriteViewModel)
 
             }
 
@@ -131,28 +159,24 @@ fun MainScreen(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Box(modifier = Modifier.height(60.dp)) {
-                BottomNavigationBar((navController))
-            }
-            Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
-        },
-        floatingActionButton =
-            {
+    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+        Box(modifier = Modifier.height(60.dp)) {
+            BottomNavigationBar((navController))
+        }
+        Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
+    }, floatingActionButton = {
 
-                if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
-                    navController.navigate(
-                        ScreenRoute.GoogleMap
-                    )
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_heart),
-                        contentDescription = "add location"
-                    )
-                }
-            }
+        if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
+            navController.navigate(
+                ScreenRoute.GoogleMap
+            )
+        }) {
+            Icon(
+                painter = painterResource(R.drawable.ic_heart),
+                contentDescription = "add location"
+            )
+        }
+    }
 
     ) { contentPadding ->
         NavHost(
@@ -165,7 +189,7 @@ fun MainScreen(
                 HomeScreen(homeViewModel)
             }
             composable(route = ScreenRoute.Favorite.route) {
-                FavoriteScreen(favoriteViewModel,navController)
+                FavoriteScreen(favoriteViewModel, navController)
             }
             composable(route = ScreenRoute.Alerts.route) {
                 AlertsScreen(navController)
@@ -174,11 +198,11 @@ fun MainScreen(
                 SettingsScreen(settingsViewModel)
             }
             composable<ScreenRoute.GoogleMap> {
-                MapScreen(favoriteViewModel,navController)
+                MapScreen(favoriteViewModel, navController)
             }
             composable<ScreenRoute.FavoriteDetails> { navBackStackEntry ->
                 val data = navBackStackEntry.toRoute<ScreenRoute.FavoriteDetails>()
-               FavoriteDetailsScreen(homeViewModel,data.lat,data.lon)
+                FavoriteDetailsScreen(homeViewModel, data.lat, data.lon)
             }
         }
     }
