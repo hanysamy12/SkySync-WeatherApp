@@ -5,6 +5,7 @@ import com.example.skysync.data.local.WeatherLocalDataSource
 import com.example.skysync.data.remote.WeatherRemoteDataSource
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
+import com.example.skysync.models.SearchLocationsResponse
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 
@@ -33,6 +34,11 @@ class WeatherRepositoryImp(
     ): Flow<ForecastWeatherResponse> {
         return remoteDataSource.getForecast(lat, lon, language, unit)
     }
+
+    override suspend fun searchLocation(searchQuery: String): Flow<SearchLocationsResponse> {
+        return remoteDataSource.searchForLocation(searchQuery)
+    }
+
     override fun getFavoriteLocations(): Flow<List<StoredLocation>> {
         return localDataSource.getAllLocations()
     }

@@ -2,6 +2,7 @@ package com.example.skysync.data.remote
 
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
+import com.example.skysync.models.SearchLocationsResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -25,6 +26,11 @@ class WeatherRemoteDataSourceImp private constructor(val service: ApiService) :
     ): Flow<ForecastWeatherResponse >{
         val forecast = service.getForecast(lat, lon, language =language, unit = unit)
         return  flowOf(forecast)
+    }
+
+    override suspend fun searchForLocation(searchQuery: String): Flow<SearchLocationsResponse> {
+        val searchResult = service.getGeocode(searchQuery)
+        return flowOf(searchResult)
     }
 
     companion object {

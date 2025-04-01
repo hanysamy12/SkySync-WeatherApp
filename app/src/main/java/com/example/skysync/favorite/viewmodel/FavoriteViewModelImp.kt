@@ -14,11 +14,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 private const val TAG = "FavoriteViewModelImp"
 class FavoriteViewModelImp(private val weatherRepository: WeatherRepository,private val location: Location) : ViewModel(),
     FavoriteViewModel {
-        
+        init {
+          //  viewModelScope.launch { searchLocation("Alam") }
+
+        }
     private val mutableFavoriteList =
         MutableStateFlow<Response<List<StoredLocation>>>(Response.Loading)
     val favoriteList: StateFlow<Response<List<StoredLocation>>> = mutableFavoriteList
@@ -45,8 +49,17 @@ class FavoriteViewModelImp(private val weatherRepository: WeatherRepository,priv
                 .collect { locations ->
                     mutableFavoriteList.value = Response.Success(locations)
                 }
+
         } catch (e: Exception) {
             mutableMessage.value = Response.Failure(e)
+        }
+    }
+
+    override suspend fun searchLocation(searchQuery: String) {
+        Log.i(TAG, "searchLocation: //////")
+        weatherRepository.searchLocation(searchQuery).collect { locations ->
+
+            Log.i(TAG, "searchLocation: $locations")
         }
     }
 }

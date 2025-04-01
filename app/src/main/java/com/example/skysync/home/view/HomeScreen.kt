@@ -55,6 +55,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 //private const val TAG = "HomeScreen"
 
@@ -214,7 +215,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f),
-                    horizontalAlignment = Alignment.End
+                    horizontalAlignment = Alignment.Start
                 ) {
                     val temp = if (lang == "ar") {
                         numEnToAr(
@@ -224,7 +225,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
                     } else {
                         currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp
                     }
-                    Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 20.sp)
+                    Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 16.sp)
                     Text(
                         "${stringResource(R.string.feels)} $temp",
                         fontSize = 12.sp

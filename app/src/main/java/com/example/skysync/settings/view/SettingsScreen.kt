@@ -16,6 +16,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -115,13 +116,21 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
+                        /*Checkbox(
                             checked = englishChecked, onCheckedChange = {
                                 englishChecked = it
                                 arabicChecked = !it
                                     viewModel.setLanguage("en")
 
-                            })
+                            })*/
+                        RadioButton(
+                            selected = englishChecked,
+                            onClick = {
+                                englishChecked = true
+                                arabicChecked = false
+                                viewModel.setLanguage("en")
+                            }
+                        )
                         Text(stringResource(R.string.english), fontSize = 14.sp) ///Fixed
                     }
                     Row(
@@ -129,12 +138,20 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
+                        /*Checkbox(
                             checked = arabicChecked, onCheckedChange = {
                                 arabicChecked = it
                                 englishChecked = !it
                                 viewModel.setLanguage("ar")
-                            })
+                            })*/
+                        RadioButton(
+                            selected = arabicChecked,
+                            onClick = {
+                                arabicChecked = true
+                                englishChecked = false
+                                viewModel.setLanguage("ar")
+                            }
+                        )
                         Text(stringResource(R.string.arabic), fontSize = 14.sp) ///Fixed
                     }
                 }
@@ -167,12 +184,14 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = gpsChecked, onCheckedChange = {
-                                gpsChecked = it
-                                mapChecked = !it
-                                viewModel.setLocationWay("gps")
-                            })
+
+                        RadioButton(
+                            selected = gpsChecked,
+                            onClick = { gpsChecked = true
+                                mapChecked = false
+                                viewModel.setLocationWay("gps") },
+
+                        )
                         Text(stringResource(R.string.gps), fontSize = 14.sp)
                     }
                     Row(
@@ -180,10 +199,10 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = mapChecked, onCheckedChange = {
-                                mapChecked = it
-                                gpsChecked = !it
+                        RadioButton(
+                            selected = mapChecked, onClick = {
+                                mapChecked = true
+                                gpsChecked = false
                                 viewModel.setLocationWay("map")
                             })
                         Text(stringResource(R.string.map), fontSize = 14.sp)
@@ -216,38 +235,49 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                             .height(30.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = kelvinChecked, onCheckedChange = {
-                                kelvinChecked = it
-                                celsiusChecked = !it
-                                fahrenheitChecked=!it
+                        RadioButton(
+                            selected = kelvinChecked, onClick = {
+                                kelvinChecked = true
+                                celsiusChecked = false
+                                fahrenheitChecked=false
                                 viewModel.setTempUnit("standard")
+                                meterChecked = true
+                                mileChecked = false
+                                viewModel.setWindUnit("meter")
+
+
                             })
-                        Text(stringResource(R.string.kelvin), fontSize = 14.sp)
+                        Text(stringResource(R.string.kelvin), fontSize = 12.sp)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = celsiusChecked, onCheckedChange = {
-                                celsiusChecked = it
-                                kelvinChecked = !it
-                                fahrenheitChecked=!it
+                        RadioButton(
+                            selected = celsiusChecked, onClick = {
+                                celsiusChecked = true
+                                kelvinChecked = false
+                                fahrenheitChecked=false
                                 viewModel.setTempUnit("metric")
+                                meterChecked = true
+                                mileChecked = false
+                                viewModel.setWindUnit("meter")
                             })
-                        Text(stringResource(R.string.celsius), fontSize = 14.sp)
+                        Text(stringResource(R.string.celsius), fontSize = 12.sp)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = fahrenheitChecked, onCheckedChange = {
-                                fahrenheitChecked = it
-                                celsiusChecked = !it
-                                kelvinChecked =!it
+                        RadioButton(
+                            selected = fahrenheitChecked, onClick = {
+                                fahrenheitChecked = true
+                                celsiusChecked = false
+                                kelvinChecked =false
                                 viewModel.setTempUnit("imperial")
+                                mileChecked = true
+                                meterChecked = false
+                                viewModel.setWindUnit("mile")
                             })
-                        Text(stringResource(R.string.fahrenheit), fontSize = 14.sp)
+                        Text(stringResource(R.string.fahrenheit), fontSize = 12.sp)
                     }
                 }
             }
@@ -279,11 +309,15 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = mileChecked, onCheckedChange = {
-                                mileChecked = it
-                                meterChecked = !it
+                        RadioButton(
+                            selected = mileChecked, onClick = {
+                                mileChecked = true
+                                meterChecked = false
                                 viewModel.setWindUnit("mile")
+                                fahrenheitChecked = true
+                                celsiusChecked = false
+                                kelvinChecked =false
+                                viewModel.setTempUnit("imperial")
                             })
                         Text(stringResource(R.string.miles_hour), fontSize = 14.sp)
                     }
@@ -292,11 +326,15 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = meterChecked, onCheckedChange = {
-                                meterChecked = it
-                                mileChecked = !it
+                        RadioButton(
+                            selected = meterChecked, onClick = {
+                                meterChecked = true
+                                mileChecked = false
                                 viewModel.setWindUnit("meter")
+                                celsiusChecked = true
+                                kelvinChecked = false
+                                fahrenheitChecked=false
+                                viewModel.setTempUnit("metric")
                             })
                         Text(stringResource(R.string.meter_sec), fontSize = 14.sp)
                     }
