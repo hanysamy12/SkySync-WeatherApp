@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.skysync.helper.Constants
 import com.example.skysync.helper.MyNotifications
 import com.example.skysync.helper.MyNotifications.PermissionHelper
@@ -23,7 +24,7 @@ class AlertViewModelImp(
         PermissionHelper.checkNotificationPermission(activity)
     }
 
-    override fun addAlert(alertTime: Long) {
+    override fun addAlert(alertTime: Long,isAlarm: Boolean) {
         val currentTime = System.currentTimeMillis()
         val delay = if (alertTime > currentTime) {
             alertTime - currentTime
@@ -33,7 +34,10 @@ class AlertViewModelImp(
         Log.i(TAG, "addAlert: current = $currentTime // alertTime = $alertTime //// delay = $delay")
         val request =
             OneTimeWorkRequestBuilder<MyWorkManager>().addTag(Constants.MY_WORK_MANAGER_TAG)
-                .setInitialDelay(delay,TimeUnit.MILLISECONDS).build()
+                .setInitialDelay(delay,TimeUnit.MILLISECONDS)
+                .setInputData(
+                    workDataOf(Constants.IS_ALARM_CODE to isAlarm)
+                ).build()
         workManager.enqueue(request)
       //  myNotifications.sendNotification()
     }
