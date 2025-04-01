@@ -41,11 +41,14 @@ import com.example.skysync.alerts.viewmodel.AlertViewModelImp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun AlertsScreen(viewModel: AlertViewModelImp) {
     var isAlarmBoardVisible by remember { mutableStateOf(false) }
     var selectedTimeInMillis by remember { mutableStateOf<Long?>(null) }
+    var alarmChecked by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,16 +58,20 @@ fun AlertsScreen(viewModel: AlertViewModelImp) {
         if (isAlarmBoardVisible) {
             AlarmBoard(onTimeSelected = { timeInMillis ->
                 selectedTimeInMillis = timeInMillis
-            },selectedTimeInMillis = selectedTimeInMillis)
+            }, selectedTimeInMillis = selectedTimeInMillis, alarmChecked, { alarmChecked = it })
             ElevatedButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                colors = ButtonDefaults.elevatedButtonColors(MaterialTheme.colorScheme.primary.copy(.6f)),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    MaterialTheme.colorScheme.primary.copy(
+                        .6f
+                    )
+                ),
                 onClick = {
                     isAlarmBoardVisible = false
-                    selectedTimeInMillis?.let {
-                        viewModel.addAlert(it)
+                    selectedTimeInMillis?.let { time ->
+                        viewModel.addAlert(time, alarmChecked)
                     }
                 }) { Text("Save") }
         }
@@ -73,7 +80,11 @@ fun AlertsScreen(viewModel: AlertViewModelImp) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                colors = ButtonDefaults.elevatedButtonColors(MaterialTheme.colorScheme.primary.copy(.3f)),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    MaterialTheme.colorScheme.primary.copy(
+                        .3f
+                    )
+                ),
                 onClick = {
                     isAlarmBoardVisible = true
                     viewModel.requestNotificationPermission()
@@ -82,12 +93,14 @@ fun AlertsScreen(viewModel: AlertViewModelImp) {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AlarmBoard(onTimeSelected: (Long) -> Unit,
-                       selectedTimeInMillis: Long? ) {
-    var notificationChecked by remember { mutableStateOf(true) }
-    var alarmChecked by remember { mutableStateOf(false) }
+private fun AlarmBoard(
+    onTimeSelected: (Long) -> Unit,
+    selectedTimeInMillis: Long?, alarmChecked: Boolean, onAlarmChecked: (Boolean) -> Unit
+) {
+    //var alarmChecked by remember { mutableStateOf(false) }
     ///////
     var isPickerVisible by remember { mutableStateOf(false) }
     val currentTime = Calendar.getInstance()
@@ -97,21 +110,22 @@ private fun AlarmBoard(onTimeSelected: (Long) -> Unit,
         initialMinute = currentTime.get(Calendar.MINUTE),
         is24Hour = true,
     )
-    if (isPickerVisible)
-    {
+    if (isPickerVisible) {
         TimePickerDialog(
-            onCancel = {isPickerVisible =false},
-            onConfirm = {val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                set(Calendar.MINUTE, timePickerState.minute)
-            }
+            onCancel = { isPickerVisible = false },
+            onConfirm = {
+                val calendar = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                    set(Calendar.MINUTE, timePickerState.minute)
+                }
 
                 val timeInMillis = calendar.timeInMillis
-               /// Log.i(TAG ,"Selected: $timeInMillis $selectedHour :$selectedMinute")
+                /// Log.i(TAG ,"Selected: $timeInMillis $selectedHour :$selectedMinute")
                 onTimeSelected(timeInMillis)
-                isPickerVisible = false },
+                isPickerVisible = false
+            },
             toggle = {},
-            content = {TimePicker(state = timePickerState)}
+            content = { TimePicker(state = timePickerState) }
         )
     }
     ///////////
@@ -125,51 +139,49 @@ private fun AlarmBoard(onTimeSelected: (Long) -> Unit,
                 shape = RoundedCornerShape(20.dp)
             ), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-
-        Row (Modifier.padding(top = 10.dp)){
+        Row(Modifier.padding(top = 10.dp)) {
             Text("Set Alert", fontSize = 20.sp)
         }
-        Row (verticalAlignment = Alignment.CenterVertically){
+        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_alarm_clock),
-                        contentDescription = null,
-                        tint = Color.Unspecified
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp, horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_alarm_clock),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+                Text(" Time : ")
+                TextButton(onClick = { isPickerVisible = true }) {
+                    Text(
+                        selectedTimeInMillis?.let {
+                            SimpleDateFormat("HH:mm a", Locale.getDefault()).format(Date(it))///
+                        } ?: "Select Time",
+                        fontSize = 20.sp
                     )
-                    Text(" Time : ")
-                    TextButton( onClick = { isPickerVisible= true }) {
-                        Text(
-                            selectedTimeInMillis?.let {
-                                SimpleDateFormat("HH:mm a").format(Date(it))
-                            } ?: "Select Time",
-                            fontSize = 20.sp
-                        )
-                    }
+                }
 
-              /*  Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_alarm_clock),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-                    Text(" To : ", Modifier.weight(.6f))
-                    TextButton(modifier = Modifier.weight(2f), onClick = {}) {
-                        Text("Start Date", fontSize = 20.sp)
-                    }
-                }*/
+                /*  Row(
+                      Modifier
+                          .fillMaxWidth()
+                          .padding(vertical = 5.dp, horizontal = 10.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Icon(
+                          painterResource(id = R.drawable.ic_alarm_clock),
+                          contentDescription = null,
+                          tint = Color.Unspecified
+                      )
+                      Text(" To : ", Modifier.weight(.6f))
+                      TextButton(modifier = Modifier.weight(2f), onClick = {}) {
+                          Text("Start Date", fontSize = 20.sp)
+                      }
+                  }*/
             }
         }
         Row(
@@ -181,21 +193,18 @@ private fun AlarmBoard(onTimeSelected: (Long) -> Unit,
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     onClick = {
-                        notificationChecked = true
-                        alarmChecked = false
+                        onAlarmChecked(false)
                     },
-                    selected =  notificationChecked
-
+                    selected = !alarmChecked
                 )
                 Text("Notification")
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     onClick = {
-                        alarmChecked = true
-                        notificationChecked = false
+                        onAlarmChecked(true)
                     },
-                    selected =  alarmChecked
+                    selected = alarmChecked
 
                 )
                 Text("Alarm")
