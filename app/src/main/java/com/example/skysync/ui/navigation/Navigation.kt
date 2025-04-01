@@ -22,15 +22,21 @@ data class NavigationItem(
     val title: String, val icon: Painter, val route: String
 )
 
+private const val TAG = "BottomNavigationBar"
 @Serializable
 sealed class ScreenRoute(val route: String) {
+    @Serializable
     object Home : ScreenRoute("home")
+    @Serializable
     object Favorite : ScreenRoute("favorite")
+    @Serializable
     object Alerts : ScreenRoute("alerts")
+    @Serializable
     object Settings : ScreenRoute("settings")
-
     @Serializable
     object GoogleMap : ScreenRoute("googleMap")
+    @Serializable
+    data class FavoriteDetails( val lat: Double, val lon: Double) : ScreenRoute("favoriteDetails")
 
 }
 

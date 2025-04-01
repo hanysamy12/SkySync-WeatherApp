@@ -8,11 +8,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.skysync.data.Location
 import com.example.skysync.helper.Response
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.DataStoreRepository
 import com.example.skysync.repo.WeatherRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,7 +24,9 @@ import kotlinx.coroutines.launch
 private const val TAG = "CurrentWeatherViewModel"
 
 class CurrentWeatherViewModelImp(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+    private val repo: WeatherRepository,
+    private val dataStoreRepo: DataStoreRepository,
+    private val location: Location
 ) : CurrentWeatherViewModel, ViewModel() {
 
     private val mutableWeather =
@@ -70,17 +74,20 @@ class CurrentWeatherViewModelImp(
     // Kelvin use units=standard
 
     override fun loadInitialValues(): Triple<String, String, String> {
+        mutableWeather.value = Response.Loading
+        mutableForecast.value = Response.Loading
         viewModelScope.launch {
             try {
+
                 language = dataStoreRepo.getLanguage().first()
                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
                 windUnit = dataStoreRepo.getWindUnit()
 
-                dataStoreRepo.getLatLongFromDataStore().first().let { (lat, lon) ->
+                location.getLocation().let { (lat, lon) ->
                     if (lat != null && lon != null) {
                         getCurrentWeather(lat, lon, language, temperatureUnit)
                         getForecast(lat, lon, language, temperatureUnit)
-
+                        Log.i(TAG, "loadInitialValues: $lat ,, $lon ????")
                     } else {
                         mutableMessage.value = Response.Failure(Exception("Location Not Enabled"))
                     }
@@ -93,14 +100,41 @@ class CurrentWeatherViewModelImp(
         return Triple(language, temperatureUnit, windUnit)
     }
 
+    override fun loadFavoriteInitialValues(
+        lat: Double,
+        lon: Double
+    ): Triple<String, String, String> {
+        mutableWeather.value = Response.Loading
+        mutableForecast.value = Response.Loading
+        viewModelScope.launch {
+            try {
+                language = dataStoreRepo.getLanguage().first()
+                temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                windUnit = dataStoreRepo.getWindUnit()
+                getCurrentWeather(lat, lon, language, temperatureUnit)
+                getForecast(lat, lon, language, temperatureUnit)
+            } catch (e: Exception) {
+                mutableMessage.value = Response.Failure(e)
+            }
+        }
+        return Triple(language, temperatureUnit, windUnit)
 
-    private suspend fun getCurrentWeather(lat: Long, lon: Long, language: String, unit: String) {
-        Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit//////")
+    }
+
+
+    private suspend fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        language: String,
+        unit: String
+    ) {
+        Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit/ $lat/ $lon////")
 
         try {
             repo.getCurrentWeather(lat, lon, language, unit)
                 .catch { error -> mutableWeather.value = Response.Failure(error) }
                 .collect { weather ->
+                    delay(200)
                     mutableWeather.value = Response.Success(weather)
                 }
         } catch (e: Exception) {
@@ -109,7 +143,7 @@ class CurrentWeatherViewModelImp(
         }
     }
 
-    private suspend fun getForecast(lat: Long, lon: Long, language: String, unit: String) {
+    private suspend fun getForecast(lat: Double, lon: Double, language: String, unit: String) {
 
         try {
             repo.getForecast(lat, lon, language, unit)
@@ -126,9 +160,11 @@ class CurrentWeatherViewModelImp(
 
 
 class HomeViewModelFactory(
-    private val repo: WeatherRepository, private val dataStoreRepo: DataStoreRepository
+    private val repo: WeatherRepository,
+    private val dataStoreRepo: DataStoreRepository,
+    private val location: Location
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CurrentWeatherViewModelImp(repo, dataStoreRepo) as T
+        return CurrentWeatherViewModelImp(repo, dataStoreRepo, location) as T
     }
 }

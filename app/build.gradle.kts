@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.1.10"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -17,6 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+       // manifestPlaceholders=[MAPS_API_KEY: MAPS_API_KEY]
     }
 
     buildTypes {
@@ -63,7 +66,12 @@ dependencies {
     //Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
-
+    //Room
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
     val nav_version = "2.8.8"
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -77,7 +85,16 @@ dependencies {
     //DataStore
     //Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    //Proto DataStore
-   // implementation("androidx.datastore:datastore-core:1.1.3")
+    //glide
+    implementation(platform("androidx.compose:compose-bom:2025.02.00"))
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    //Google maps
+    implementation("com.google.maps.android:maps-compose:2.14.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    //Google maps Search
+    //implementation("com.google.android.libraries.places:places:4.2.0")
+    val work_version = "2.10.0"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 
 }
