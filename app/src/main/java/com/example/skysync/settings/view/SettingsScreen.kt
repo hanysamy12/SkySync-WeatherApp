@@ -31,18 +31,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.skysync.helper.Constants
 import com.example.skysync.R
 import com.example.skysync.settings.viewmodel.SettingsViewModel
+import com.example.skysync.ui.navigation.ScreenRoute
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel) {
+fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
 
     //language
     var englishChecked by remember { mutableStateOf(false) }
     var arabicChecked by remember { mutableStateOf(false) }
     //location
-    var gpsChecked by remember { mutableStateOf(false) }
+    var gpsChecked by remember { mutableStateOf(true) }
     var mapChecked by remember { mutableStateOf(false) }
     //speed
     var meterChecked by remember { mutableStateOf(false) }
@@ -60,10 +62,12 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         }
 
         // location
+/*
         when(settings[Constants.SETTINGS_LOCATION]) {
             "gps" -> gpsChecked = true
             "map" -> mapChecked = true
         }
+*/
 
         //  wind
         when(settings[Constants.SETTINGS_WIND]) {
@@ -204,6 +208,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                                 mapChecked = true
                                 gpsChecked = false
                                 viewModel.setLocationWay("map")
+                                navController.navigate(ScreenRoute.GoogleMap(Constants.SETTINGS_SCREEN))
                             })
                         Text(stringResource(R.string.map), fontSize = 14.sp)
                     }

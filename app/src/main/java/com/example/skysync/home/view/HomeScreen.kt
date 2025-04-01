@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -55,14 +54,12 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.math.roundToInt
 
-//private const val TAG = "HomeScreen"
-
+private const val TAG = "HomeScreen"
 //@Preview()
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
+fun HomeScreen(viewModel: CurrentWeatherViewModelImp,lat : Double? ,lon: Double?) {
     val fahrenheitSymbol = stringResource(R.string.fahrenheit_symbol)
     val celsiusSymbol = stringResource(R.string.celsius_symbol)
     val kelvinSymbol = stringResource(R.string.kelvin_symbol)
@@ -73,7 +70,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
     var windUnit = rememberSaveable { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues()
+        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues(lat,lon)
         lang.value = language
         windUnit.value = when (windSpeedUnit) {
             "mile" -> mileSymbol
@@ -91,7 +88,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
     //val language = viewModel.
-    Box(Modifier.fillMaxSize(),) {
+    Box(Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.bg_home),
             contentDescription = "background Image",
@@ -101,7 +98,6 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                //.background(gradientBrush)
                 .padding(10.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -469,9 +465,6 @@ fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUnit: Stri
 @Composable
 fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
 
-    // Log.i(TAG, "HourItem: $lang // $tempUnit")
-    // var hour = "forecastList?.list"
-    var icon: Painter = painterResource(R.drawable.ic_sunrise)
     Column(
         modifier = Modifier
             //.width(60.dp)

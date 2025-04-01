@@ -45,7 +45,7 @@ fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon:
     var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
     var windUnit = rememberSaveable { mutableStateOf("") }
     LaunchedEffect(lat,lon) {
-        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadFavoriteInitialValues(lat,lon)
+        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues(lat,lon)
         lang.value = language
         windUnit.value = when (windSpeedUnit) {
             "mile" -> mileSymbol

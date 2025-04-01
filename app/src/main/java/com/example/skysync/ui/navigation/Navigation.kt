@@ -26,7 +26,7 @@ private const val TAG = "BottomNavigationBar"
 @Serializable
 sealed class ScreenRoute(val route: String) {
     @Serializable
-    object Home : ScreenRoute("home")
+    data class Home(val lat: Double?, val lon: Double?) : ScreenRoute("home/$lat/$lon")
     @Serializable
     object Favorite : ScreenRoute("favorite")
     @Serializable
@@ -34,7 +34,7 @@ sealed class ScreenRoute(val route: String) {
     @Serializable
     object Settings : ScreenRoute("settings")
     @Serializable
-    object GoogleMap : ScreenRoute("googleMap")
+    data class GoogleMap(val sourceRoute : Int) : ScreenRoute("googleMap")
     @Serializable
     data class FavoriteDetails( val lat: Double, val lon: Double) : ScreenRoute("favoriteDetails")
 
@@ -44,7 +44,7 @@ sealed class ScreenRoute(val route: String) {
 fun BottomNavigationBar(navController: NavController) {
 
     val navigationItems = listOf(
-        NavigationItem(stringResource(R.string.home), painterResource(R.drawable.ic_home), ScreenRoute.Home.route),
+        NavigationItem(stringResource(R.string.home), painterResource(R.drawable.ic_home), ScreenRoute.Home(null,null).route),
         NavigationItem(
             stringResource(R.string.favorite), painterResource(R.drawable.ic_heart), ScreenRoute.Favorite.route
         ),

@@ -1,6 +1,5 @@
 package com.example.skysync.favorite.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -28,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.skysync.R
 import com.example.skysync.favorite.viewmodel.FavoriteViewModel
+import com.example.skysync.helper.Constants
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -40,7 +39,7 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "MapScreen"
 @Composable
-fun MapScreen(viewModel: FavoriteViewModel, navController: NavController) {
+fun MapScreen(viewModel: FavoriteViewModel, navController: NavController,sourceScreen : Int = 0) {
     var lat by remember { mutableDoubleStateOf(29.394835) }
     var lon by remember { mutableDoubleStateOf(30.902915) }
     var searchQuery by remember { mutableStateOf("") }
@@ -80,13 +79,17 @@ fun MapScreen(viewModel: FavoriteViewModel, navController: NavController) {
 
         }
         Column(
-            modifier = Modifier.fillMaxSize().padding(10.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             /*TextField(value = searchQuery , onValueChange = {query -> searchQuery = query
                 Log.i(TAG, "MapScreen: $query")})*/
+            if(sourceScreen== Constants.FAVORITE_SCREEN)
+            {
             ElevatedButton(
                 onClick = {
                     coroutineScope.launch {viewModel.addFavoriteLocation(clickedPosition) }
@@ -103,7 +106,25 @@ fun MapScreen(viewModel: FavoriteViewModel, navController: NavController) {
                     stringResource(R.string.add_to_favorite),
                     Modifier.background(Color.Transparent)
                 )
-            }
+            }}
+            if(sourceScreen== Constants.SETTINGS_SCREEN)
+            {
+                ElevatedButton(
+                    onClick = {
+                        navController.navigate("home/${lat}/${lon}")
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = Color.White
+                    ),
+                    enabled = buttonEnabled
+                ) {
+                    Text(
+                        stringResource(R.string.go_to_home),
+                        Modifier.background(Color.Transparent)
+                    )
+                }}
 
         }
     }

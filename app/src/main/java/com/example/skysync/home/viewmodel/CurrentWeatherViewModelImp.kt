@@ -73,26 +73,30 @@ class CurrentWeatherViewModelImp(
     //Celsius use units=metric
     // Kelvin use units=standard
 
-    override fun loadInitialValues(): Triple<String, String, String> {
+    override fun loadInitialValues(
+        lat: Double?,
+        lon: Double?
+    ): Triple<String, String, String> {
+        Log.i(TAG, "loadInitialValues: lat $lat /// lon $lon")
         mutableWeather.value = Response.Loading
         mutableForecast.value = Response.Loading
         viewModelScope.launch {
             try {
+                if (lat == null || lon == null) {
+                    language = dataStoreRepo.getLanguage().first()
+                    temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                    windUnit = dataStoreRepo.getWindUnit()
 
-                language = dataStoreRepo.getLanguage().first()
-                temperatureUnit = dataStoreRepo.getTemperatureUnit()
-                windUnit = dataStoreRepo.getWindUnit()
-
-                location.getLocation().let { (lat, lon) ->
-                    if (lat != null && lon != null) {
+                    location.getLocation().let { (lat, lon) ->
                         getCurrentWeather(lat, lon, language, temperatureUnit)
                         getForecast(lat, lon, language, temperatureUnit)
                         Log.i(TAG, "loadInitialValues: $lat ,, $lon ????")
-                    } else {
-                        mutableMessage.value = Response.Failure(Exception("Location Not Enabled"))
+
                     }
+                } else {
+                    getCurrentWeather(lat, lon, language, temperatureUnit)
+                    getForecast(lat, lon, language, temperatureUnit)
                 }
-
             } catch (e: Exception) {
                 mutableMessage.value = Response.Failure(e)
             }
@@ -100,26 +104,26 @@ class CurrentWeatherViewModelImp(
         return Triple(language, temperatureUnit, windUnit)
     }
 
-    override fun loadFavoriteInitialValues(
-        lat: Double,
-        lon: Double
-    ): Triple<String, String, String> {
-        mutableWeather.value = Response.Loading
-        mutableForecast.value = Response.Loading
-        viewModelScope.launch {
-            try {
-                language = dataStoreRepo.getLanguage().first()
-                temperatureUnit = dataStoreRepo.getTemperatureUnit()
-                windUnit = dataStoreRepo.getWindUnit()
-                getCurrentWeather(lat, lon, language, temperatureUnit)
-                getForecast(lat, lon, language, temperatureUnit)
-            } catch (e: Exception) {
-                mutableMessage.value = Response.Failure(e)
-            }
-        }
-        return Triple(language, temperatureUnit, windUnit)
-
-    }
+    /*  override fun loadFavoriteInitialValues(
+          lat: Double,
+          lon: Double
+      ): Triple<String, String, String> {
+          mutableWeather.value = Response.Loading
+          mutableForecast.value = Response.Loading
+          viewModelScope.launch {
+              try {
+                  language = dataStoreRepo.getLanguage().first()
+                  temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                  windUnit = dataStoreRepo.getWindUnit()
+                  getCurrentWeather(lat, lon, language, temperatureUnit)
+                  getForecast(lat, lon, language, temperatureUnit)
+              } catch (e: Exception) {
+                  mutableMessage.value = Response.Failure(e)
+              }
+          }
+          return Triple(language, temperatureUnit, windUnit)
+  
+      }*/
 
 
     private suspend fun getCurrentWeather(
