@@ -1,9 +1,8 @@
 package com.example.skysync.repo
 
-import androidx.room.Query
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
-import com.example.skysync.models.SearchLocationsResponse
+import com.example.skysync.models.SearchLocationsResponseItem
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 
@@ -22,7 +21,7 @@ interface WeatherRepository {
         language: String,
         unit: String
     ): Flow<ForecastWeatherResponse>
-    suspend fun searchLocation(searchQuery: String): Flow<SearchLocationsResponse>
+    suspend fun searchLocation(searchQuery: String): Flow<List<SearchLocationsResponseItem>>
     suspend fun adNewFavoriteLocations(storedLocation: StoredLocation): Long
     suspend fun deleteFavoriteLocation(storedLocation: StoredLocation): Int
 

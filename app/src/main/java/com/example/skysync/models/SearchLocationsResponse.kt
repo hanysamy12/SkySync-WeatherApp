@@ -1,9 +1,5 @@
 package com.example.skysync.models
 
-data class SearchLocationsResponse(
-	val searchLocationsResponse: List<SearchLocationsResponseItem?>? = null
-)
-
 data class LocalNames(
 	val tk: String? = null,
 	val es: String? = null

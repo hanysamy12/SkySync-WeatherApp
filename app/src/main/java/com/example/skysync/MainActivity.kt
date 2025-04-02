@@ -163,7 +163,7 @@ fun MainScreen(
     ) { contentPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home/null/null",
+            startDestination = ScreenRoute.Home().route,
             modifier = Modifier.padding(contentPadding)
 
         ) {

@@ -104,26 +104,7 @@ class CurrentWeatherViewModelImp(
         return Triple(language, temperatureUnit, windUnit)
     }
 
-    /*  override fun loadFavoriteInitialValues(
-          lat: Double,
-          lon: Double
-      ): Triple<String, String, String> {
-          mutableWeather.value = Response.Loading
-          mutableForecast.value = Response.Loading
-          viewModelScope.launch {
-              try {
-                  language = dataStoreRepo.getLanguage().first()
-                  temperatureUnit = dataStoreRepo.getTemperatureUnit()
-                  windUnit = dataStoreRepo.getWindUnit()
-                  getCurrentWeather(lat, lon, language, temperatureUnit)
-                  getForecast(lat, lon, language, temperatureUnit)
-              } catch (e: Exception) {
-                  mutableMessage.value = Response.Failure(e)
-              }
-          }
-          return Triple(language, temperatureUnit, windUnit)
-  
-      }*/
+
 
 
     private suspend fun getCurrentWeather(
