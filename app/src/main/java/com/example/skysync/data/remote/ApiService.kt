@@ -2,7 +2,7 @@ package com.example.skysync.data.remote
 
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
-import com.example.skysync.models.SearchLocationsResponse
+import com.example.skysync.models.SearchLocationsResponseItem
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -41,5 +41,5 @@ interface ApiService {
 @Query("q") query : String,
 @Query("limit") lim : Int = 5,
 @Query("appid") appId: String = "4d8ffcfda7b01ee2b930a3cd193273e4"
-    ): SearchLocationsResponse
+    ): List<SearchLocationsResponseItem>
 }

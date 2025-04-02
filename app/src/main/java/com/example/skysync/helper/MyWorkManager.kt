@@ -13,10 +13,10 @@ class MyWorkManager(private val context: Context, workerParams: WorkerParameters
     CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         try {
-                // delay(200)
                 Log.i(TAG, "doWork: Worker/////////")
+            val isAlarm  = inputData.getBoolean(Constants.IS_ALARM_CODE,false)
                 val notification = MyNotifications(context)
-                notification.sendNotification()
+                notification.sendNotification(isAlarm)
                 return Result.success()
 
         } catch (e: Exception) {
@@ -26,17 +26,7 @@ class MyWorkManager(private val context: Context, workerParams: WorkerParameters
                 )
             )
         }
-    }
-    private fun isWithinTimeRange(startHour: Int ,statMinuit :Int, endHour: Int, endMinuit: Int): Boolean {
-        val now = Calendar.getInstance()
-        val currentHour = now.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = now.get(Calendar.MINUTE)
 
-        val currentTime = currentHour * 60 + currentMinute
-        val startTime = startHour * 60 + statMinuit
-        val endTime = endHour * 60 + endMinuit
-
-        return currentTime in startTime .. endTime
     }
 }
 

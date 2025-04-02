@@ -2,5 +2,5 @@ package com.example.skysync.alerts.viewmodel
 
 interface AlertViewModel {
     fun requestNotificationPermission()
-    fun addAlert(alertTime:Long)
+    fun addAlert(alertTime:Long,isAlarm: Boolean)
 }

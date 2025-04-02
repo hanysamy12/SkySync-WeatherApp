@@ -15,7 +15,7 @@
     <string name="fahrenheit">Fahrenheit</string>
     <string name="wind_icon">wind Icon</string>
     <string name="wind_speed">Wind Speed</string>
-    <string name="miles_hour">m/h</string>
+    <string name="miles_hour">mph</string>
     <string name="meter_sec">m/s</string>
     <string name="fahrenheit_symbol">°F</string>
     <string name="celsius_symbol">°C</string>
@@ -33,4 +33,5 @@
     <string name="Wainting_message">Prepending Every Thing For You</string>
     <string name="no_location_selected">No Location Selected</string>
     <string name="add_to_favorite">Add To Favorite</string>
+    <string name="go_to_home">Show Details</string>
 </resources>
