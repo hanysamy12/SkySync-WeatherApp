@@ -7,6 +7,7 @@ import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
+
     fun getFavoriteLocations(): Flow<List<StoredLocation>>
     suspend fun getCurrentWeather(
         lat: Double?,

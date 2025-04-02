@@ -19,7 +19,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-       // manifestPlaceholders=[MAPS_API_KEY: MAPS_API_KEY]
+        // manifestPlaceholders=[MAPS_API_KEY: MAPS_API_KEY]
     }
 
     buildTypes {
@@ -64,8 +64,8 @@ dependencies {
     //Scoped API
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7")
     //Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     //Room
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
@@ -79,7 +79,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     //LiveData & Compose
     val compose_version = "1.0.0"
-    implementation ("androidx.compose.runtime:runtime-livedata:$compose_version")
+    implementation("androidx.compose.runtime:runtime-livedata:$compose_version")
     //Location
     implementation("com.google.android.gms:play-services-location:21.3.0")
     //DataStore
@@ -96,5 +96,9 @@ dependencies {
     //implementation("com.google.android.libraries.places:places:4.2.0")
     val work_version = "2.10.0"
     implementation("androidx.work:work-runtime-ktx:$work_version")
+
+    ///////////////////////////////////////////////////////////////////
+                 // Logging
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")                  // AndroidX JUnit
 
 }
