@@ -116,16 +116,13 @@ private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit,onD
     ) {
         Text(
             location?.name.toString(),
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             modifier = Modifier.padding(start = 12.dp)
         )
-        ///Text("Egypt, cairo", fontSize = 16.sp)
         IconButton(
             onClick = {onDeleteClicked()},
         ){ Icon(painter = painterResource(R.drawable.ic_delete),
             contentDescription = "Delete",
-            modifier = Modifier.padding(end = 12.dp))}/*(
-
-        )*/
+            modifier = Modifier.padding(end = 12.dp))}
     }
 }

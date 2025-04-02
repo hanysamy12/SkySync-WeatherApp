@@ -132,7 +132,7 @@ class Location(
             return@withContext suspendCoroutine { cont ->
                 geoCode.getFromLocation(latitude, longitude, 1, object : GeocodeListener {
                     override fun onGeocode(p0: MutableList<Address>) {
-                        cont.resume(p0[0].countryName /*+ ", " + p0[0].adminArea*/)
+                        cont.resume(p0[0].countryName + ", " + p0[0].adminArea)
 
                     }
 
