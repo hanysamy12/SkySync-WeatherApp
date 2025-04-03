@@ -96,7 +96,6 @@ dependencies {
     //implementation("com.google.android.libraries.places:places:4.2.0")
     val work_version = "2.10.0"
     implementation("androidx.work:work-runtime-ktx:$work_version")
-
     ///
     implementation ("androidx.compose.material:material:1.7.8")// Or the latest version
     ///////////////////////////////////////////////////////////////////
@@ -125,6 +124,5 @@ dependencies {
     // Logging
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")                  // AndroidX JUnit
     testImplementation ("io.mockk:mockk:1.13.8")
-
 
 }

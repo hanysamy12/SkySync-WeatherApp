@@ -17,10 +17,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SkySync"
         tools:targetApi="31">
+        <activity
+            android:name=".NotificationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_notification_activity"
+            android:theme="@style/Theme.SkySync" />
+
         <receiver
             android:name=".helper.StopAlarmReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

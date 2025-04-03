@@ -27,6 +27,11 @@ class Constants {
         const val CHANNEL_ID ="notification_channel_id"
         const val REQUEST_CODE_NOTIFICATION_PERMISSION = 1000
         const val IS_ALARM_CODE = "is_alarm"
+        const val NOTIFICATION_LAT = "notification_lat"
+        const val NOTIFICATION_LON = "notification_lon"
+        const val NOTIFICATION_LOCATION_LAT = "notification_location_lat"
+        const val NOTIFICATION_LOCATION_LON = "notification_location_lon"
+
 
         //Map Screen
         const val FAVORITE_SCREEN = 1

@@ -1,5 +1,6 @@
 package com.example.skysync.alerts.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,19 +33,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
 import com.example.skysync.R
 import com.example.skysync.alerts.viewmodel.AlertViewModelImp
+import com.example.skysync.helper.Constants
+import com.example.skysync.ui.navigation.ScreenRoute
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+private const val TAG = "AlertsScreen"
 @Composable
-fun AlertsScreen(viewModel: AlertViewModelImp) {
+fun AlertsScreen(viewModel: AlertViewModelImp, navController: NavController) {
     var isAlarmBoardVisible by remember { mutableStateOf(false) }
     var selectedTimeInMillis by remember { mutableStateOf<Long?>(null) }
     var alarmChecked by remember { mutableStateOf(false) }
@@ -56,9 +62,20 @@ fun AlertsScreen(viewModel: AlertViewModelImp) {
         verticalArrangement = Arrangement.Bottom
     ) {
         if (isAlarmBoardVisible) {
-            AlarmBoard(onTimeSelected = { timeInMillis ->
-                selectedTimeInMillis = timeInMillis
-            }, selectedTimeInMillis = selectedTimeInMillis, alarmChecked, { alarmChecked = it })
+            AlarmBoard(
+                onTimeSelected = { timeInMillis ->
+                    selectedTimeInMillis = timeInMillis
+                },
+                onMapClicked = {
+                    navController.navigate(
+                        ScreenRoute.GoogleMap(Constants.ALERTS_SCREEN)
+                    )
+                },
+                selectedTimeInMillis = selectedTimeInMillis,
+                alarmChecked = alarmChecked,
+                onAlarmChecked = { alarmChecked = it },
+
+                )
             ElevatedButton(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,10 +115,12 @@ fun AlertsScreen(viewModel: AlertViewModelImp) {
 @Composable
 private fun AlarmBoard(
     onTimeSelected: (Long) -> Unit,
-    selectedTimeInMillis: Long?, alarmChecked: Boolean, onAlarmChecked: (Boolean) -> Unit
+    onMapClicked: () -> Unit,
+    selectedTimeInMillis: Long?,
+    alarmChecked: Boolean,
+    onAlarmChecked: (Boolean) -> Unit
 ) {
-    //var alarmChecked by remember { mutableStateOf(false) }
-    ///////
+
     var isPickerVisible by remember { mutableStateOf(false) }
     val currentTime = Calendar.getInstance()
 
@@ -118,9 +137,7 @@ private fun AlarmBoard(
                     set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                     set(Calendar.MINUTE, timePickerState.minute)
                 }
-
                 val timeInMillis = calendar.timeInMillis
-                /// Log.i(TAG ,"Selected: $timeInMillis $selectedHour :$selectedMinute")
                 onTimeSelected(timeInMillis)
                 isPickerVisible = false
             },
@@ -132,7 +149,7 @@ private fun AlarmBoard(
     Column(
         Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(250.dp)
             .padding(10.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary,
@@ -142,53 +159,55 @@ private fun AlarmBoard(
         Row(Modifier.padding(top = 10.dp)) {
             Text("Set Alert", fontSize = 20.sp)
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp, horizontal = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    painterResource(id = R.drawable.ic_alarm_clock),
-                    contentDescription = null,
-                    tint = Color.Unspecified
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp, horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_alarm_clock),
+                contentDescription = "alert icon",
+                tint = Color.Unspecified
+            )
+            Text(" Time : ")
+            TextButton(
+                onClick = { isPickerVisible = true }) {
+                Text(
+                    selectedTimeInMillis?.let {
+                        SimpleDateFormat("HH:mm a", Locale.getDefault()).format(Date(it))
+                    } ?: "Select Time",
+                    fontSize = 20.sp, textDecoration = TextDecoration.Underline
                 )
-                Text(" Time : ")
-                TextButton(onClick = { isPickerVisible = true }) {
-                    Text(
-                        selectedTimeInMillis?.let {
-                            SimpleDateFormat("HH:mm a", Locale.getDefault()).format(Date(it))///
-                        } ?: "Select Time",
-                        fontSize = 20.sp
-                    )
-                }
+            }
 
-                /*  Row(
-                      Modifier
-                          .fillMaxWidth()
-                          .padding(vertical = 5.dp, horizontal = 10.dp),
-                      verticalAlignment = Alignment.CenterVertically
-                  ) {
-                      Icon(
-                          painterResource(id = R.drawable.ic_alarm_clock),
-                          contentDescription = null,
-                          tint = Color.Unspecified
-                      )
-                      Text(" To : ", Modifier.weight(.6f))
-                      TextButton(modifier = Modifier.weight(2f), onClick = {}) {
-                          Text("Start Date", fontSize = 20.sp)
-                      }
-                  }*/
+
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp, horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_location),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+            Text(" Pick Location ")
+            TextButton(
+                 onClick = { onMapClicked() }) {
+                Text(" Map ", fontSize = 20.sp, textDecoration = TextDecoration.Underline)
             }
         }
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp)
-                .weight(.5f), horizontalArrangement = Arrangement.SpaceEvenly
+                .padding(vertical = 12.dp), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
