@@ -1,5 +1,6 @@
 package com.example.skysync.favorite.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +15,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,9 +41,17 @@ import com.example.skysync.home.view.MessageShow
 import com.example.skysync.home.view.ProgressShow
 import com.example.skysync.models.StoredLocation
 import com.example.skysync.ui.navigation.ScreenRoute
+import kotlinx.coroutines.launch
 
+private const val TAG = "FavoriteScreen"
 @Composable
-fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController) {
+fun FavoriteScreen(
+    viewModel: FavoriteViewModelImp,
+    navController: NavController,
+    snackBarHostState: SnackbarHostState
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var locationToDelete by remember { mutableStateOf<StoredLocation?>(null) }
     LaunchedEffect(Unit) {
         viewModel.getAllFavoriteLocations()
     }
@@ -54,14 +70,28 @@ fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController
 
             is Response.Success<*> -> {
                 val favoriteList = (uiFavoriteState as Response.Success).data
-                FavoriteList(locationsList = favoriteList , onFavClicked = { lat, lon ->
+                FavoriteList(locationsList = favoriteList, onFavClicked = { lat, lon ->
                     navController.navigate(
                         ScreenRoute.FavoriteDetails(
                             lat,
                             lon
                         )
                     )
-                }, onDeleteClicked = {location -> viewModel.deleteFavoriteLocation(location)})
+                }, onDeleteClicked = {location ->
+                    coroutineScope.launch {
+                        locationToDelete = location
+                        val result = snackBarHostState.showSnackbar(
+                            message = "Location deleted",
+                            actionLabel = "Undo",
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            locationToDelete = null
+                        }else {
+                            locationToDelete?.let { viewModel.deleteFavoriteLocation(it) }
+                        }
+                    }
+                })
             }
         }
 
@@ -72,8 +102,9 @@ fun FavoriteScreen(viewModel: FavoriteViewModelImp, navController: NavController
 private fun FavoriteList(
     locationsList: List<StoredLocation>,
     onFavClicked: (lat: Double, lon: Double) -> Unit,
-    onDeleteClicked : (StoredLocation) -> Unit
+    onDeleteClicked: (StoredLocation) -> Unit
 ) {
+
     LazyColumn(
         Modifier
             .fillMaxSize()
@@ -82,7 +113,11 @@ private fun FavoriteList(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Text(stringResource(R.string.favorite), fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
+            Text(
+                stringResource(R.string.favorite),
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
         items(locationsList.size) {
             val currentLocation = locationsList[it]
@@ -93,13 +128,17 @@ private fun FavoriteList(
                         currentLocation.lat ?: 0.0,
                         currentLocation.lon ?: 0.0
                     )
-                }, onDeleteClicked = {onDeleteClicked(currentLocation)})
+                }, onDeleteClicked = { onDeleteClicked(currentLocation) })
         }
     }
 }
 
 @Composable
-private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit,onDeleteClicked: () -> Unit) {
+private fun FavoriteItem(
+    location: StoredLocation?,
+    onFavClicked: () -> Unit,
+    onDeleteClicked: () -> Unit
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -117,12 +156,21 @@ private fun FavoriteItem(location: StoredLocation?, onFavClicked: () -> Unit,onD
         Text(
             location?.name.toString(),
             fontSize = 18.sp,
-            modifier = Modifier.padding(start = 12.dp)
+            maxLines = 2,
+            modifier = Modifier
+                .padding(start = 12.dp)
+                .weight(.8f)
         )
         IconButton(
-            onClick = {onDeleteClicked()},
-        ){ Icon(painter = painterResource(R.drawable.ic_delete),
-            contentDescription = "Delete",
-            modifier = Modifier.padding(end = 12.dp))}
+            onClick = { onDeleteClicked() },
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_delete),
+                contentDescription = "Delete",
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .weight(.2f)
+            )
+        }
     }
 }

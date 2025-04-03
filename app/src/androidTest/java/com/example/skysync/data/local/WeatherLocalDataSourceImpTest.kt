@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +41,8 @@ class WeatherLocalDataSourceImpTest {
         //When
         val locations = localDataSource.getAllLocations().first()
         //Then
-        assertThat(listOf(location), `is`(locations))
+        assertNotNull(locations)
+      assertThat(listOf(location), `is`(locations))
     }
 
     @Test

@@ -20,8 +20,6 @@ import org.junit.runner.RunWith
 class LocationsDAOTest {
     private lateinit var dao: LocationsDAO
     private lateinit var dataBase: DataBase
-
-
     @Before
     fun setUp() {
         dataBase = Room.inMemoryDatabaseBuilder(

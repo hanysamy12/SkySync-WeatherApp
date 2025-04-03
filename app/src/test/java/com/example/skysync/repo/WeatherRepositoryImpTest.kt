@@ -1,8 +1,11 @@
 package com.example.skysync.repo
 
+import android.util.Log
 import com.example.skysync.data.local.FakeLocalDataSource
 import com.example.skysync.data.remote.FakeRemoteDateSource
 import com.example.skysync.models.StoredLocation
+import io.mockk.every
+import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -17,6 +20,9 @@ class WeatherRepositoryImpTest {
 
     @Before
     fun setUp() {
+
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
         fakeLocalDataSource = FakeLocalDataSource()
         fakeRemoteDateSource = FakeRemoteDateSource()
         repository = WeatherRepositoryImp(fakeRemoteDateSource, fakeLocalDataSource)
@@ -52,6 +58,15 @@ class WeatherRepositoryImpTest {
 
         // Then
         assertThat(result.size, `is`(0))
+    }
+    @Test
+    fun getCurrentWeather_returnsExpectedWeatherData() = runBlocking {
+        // Given
+        val expectedWeather = fakeRemoteDateSource.currentWeatherResponse
+        // When
+        val result = repository.getCurrentWeather(0.0, 0.0, "en", "metric").first()
+        // Then
+        assertThat(result, `is`(expectedWeather))
     }
 
 }

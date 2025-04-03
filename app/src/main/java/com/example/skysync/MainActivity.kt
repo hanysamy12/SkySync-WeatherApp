@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -141,25 +145,29 @@ fun MainScreen(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-        Box(modifier = Modifier.height(60.dp)) {
-            BottomNavigationBar((navController))
-        }
-        Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
-    }, floatingActionButton = {
+    val snackBarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState)},
+        bottomBar = {
+            Box(modifier = Modifier.height(60.dp)) {
+                BottomNavigationBar((navController))
+            }
+            Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
+        },
+        floatingActionButton = {
 
-        if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
-            navController.navigate(
-                ScreenRoute.GoogleMap(Constants.FAVORITE_SCREEN)
-            )
-        }) {
-            Icon(
-                painter = painterResource(R.drawable.ic_heart),
-                contentDescription = "add location"
-            )
-        }
-    }
-
+            if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
+                navController.navigate(
+                    ScreenRoute.GoogleMap(Constants.FAVORITE_SCREEN)
+                )
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_heart),
+                    contentDescription = "add location"
+                )
+            }
+        },
     ) { contentPadding ->
         NavHost(
             navController = navController,
@@ -180,7 +188,7 @@ fun MainScreen(
                 HomeScreen(homeViewModel, lat, lon)
             }
             composable(route = ScreenRoute.Favorite.route) {
-                FavoriteScreen(favoriteViewModel, navController)
+                FavoriteScreen(favoriteViewModel, navController, snackBarHostState)
             }
             composable(route = ScreenRoute.Alerts.route) {
                 AlertsScreen(alertViewModelImp)
@@ -202,6 +210,7 @@ fun MainScreen(
                 FavoriteDetailsScreen(homeViewModel, data.lat, data.lon)
             }
         }
+
     }
 }
 

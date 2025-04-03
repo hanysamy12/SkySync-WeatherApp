@@ -82,7 +82,8 @@ class FavoriteViewModelImp(
 
     override fun deleteFavoriteLocation(storedLocation: StoredLocation) {
         viewModelScope.launch {
-            weatherRepository.deleteFavoriteLocation(storedLocation)
+           val result = weatherRepository.deleteFavoriteLocation(storedLocation)
+            Log.i(TAG, "deleteFavoriteLocation: $result")
         }
     }
 
