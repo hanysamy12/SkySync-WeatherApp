@@ -15,8 +15,10 @@ class MyWorkManager(private val context: Context, workerParams: WorkerParameters
         try {
                 Log.i(TAG, "doWork: Worker/////////")
             val isAlarm  = inputData.getBoolean(Constants.IS_ALARM_CODE,false)
+            val lat = inputData.getDouble(Constants.NOTIFICATION_LOCATION_LAT,0.0)
+            val lon = inputData.getDouble(Constants.NOTIFICATION_LOCATION_LON,0.0)
                 val notification = MyNotifications(context)
-                notification.sendNotification(isAlarm)
+                notification.sendNotification(isAlarm ,lat,lon)
                 return Result.success()
 
         } catch (e: Exception) {

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -184,14 +183,13 @@ fun MainScreen(
             ) { navBackStackEntry ->
                 val lat = navBackStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = navBackStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-
                 HomeScreen(homeViewModel, lat, lon)
             }
             composable(route = ScreenRoute.Favorite.route) {
                 FavoriteScreen(favoriteViewModel, navController, snackBarHostState)
             }
             composable(route = ScreenRoute.Alerts.route) {
-                AlertsScreen(alertViewModelImp)
+                AlertsScreen(alertViewModelImp,navController)
             }
             composable(route = ScreenRoute.Settings.route) {
                 SettingsScreen(settingsViewModel, navController)
@@ -201,9 +199,10 @@ fun MainScreen(
                 val sourceScreen = when (preRoute) {
                     ScreenRoute.Favorite.route -> Constants.FAVORITE_SCREEN
                     ScreenRoute.Settings.route -> Constants.SETTINGS_SCREEN
+                    ScreenRoute.Alerts.route -> Constants.ALERTS_SCREEN
                     else -> Constants.FAVORITE_SCREEN
                 }
-                MapScreen(favoriteViewModel, navController, sourceScreen = sourceScreen)
+                MapScreen(favoriteViewModel,alertViewModelImp, navController, sourceScreen = sourceScreen)
             }
             composable<ScreenRoute.FavoriteDetails> { navBackStackEntry ->
                 val data = navBackStackEntry.toRoute<ScreenRoute.FavoriteDetails>()

@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.skysync.R
+import com.example.skysync.alerts.viewmodel.AlertViewModel
 import com.example.skysync.favorite.viewmodel.FavoriteViewModelImp
 import com.example.skysync.helper.Constants
 import com.example.skysync.models.SearchLocationsResponseItem
@@ -55,8 +56,9 @@ private const val TAG = "MapScreen"
 @Composable
 fun MapScreen(
     viewModel: FavoriteViewModelImp,
+    alertViewModel: AlertViewModel,
     navController: NavController,
-    sourceScreen: Int = 0
+    sourceScreen: Int
 ) {
     var lat by remember { mutableDoubleStateOf(29.394835) }
     var lon by remember { mutableDoubleStateOf(30.902915) }
@@ -165,7 +167,7 @@ fun MapScreen(
                     )
                 }
             }
-            if (sourceScreen == Constants.SETTINGS_SCREEN) {
+            else if (sourceScreen == Constants.SETTINGS_SCREEN) {
                 ElevatedButton(
                     onClick = {
                         navController.navigate("home/${lat}/${lon}") {
@@ -187,6 +189,31 @@ fun MapScreen(
                     )
                 }
             }
+            else if (sourceScreen == Constants.ALERTS_SCREEN) {
+                ElevatedButton(
+                    onClick = {
+                        navController.popBackStack()
+                        alertViewModel.setLatLon(lat ,lon)
+                        /*navController.navigate(ScreenRoute.Alerts) {
+                            popUpTo(ScreenRoute.Alerts.route) {
+                                inclusive = false
+                            }
+                        }*/
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = Color.White
+                    ),
+                    enabled = buttonEnabled
+                ) {
+                    Text(
+                        stringResource(R.string.set_location),
+                        Modifier.background(Color.Transparent)
+                    )
+                }
+            }
+
         }
     }
 }

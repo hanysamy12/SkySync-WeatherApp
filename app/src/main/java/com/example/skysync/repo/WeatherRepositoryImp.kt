@@ -1,6 +1,5 @@
 package com.example.skysync.repo
 
-import android.util.Log
 import com.example.skysync.data.local.WeatherLocalDataSource
 import com.example.skysync.data.remote.WeatherRemoteDataSource
 import com.example.skysync.models.CurrentWeatherResponse
@@ -9,7 +8,6 @@ import com.example.skysync.models.SearchLocationsResponseItem
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 
-private const val TAG = "WeatherRepositoryImp"
 class WeatherRepositoryImp(
     private val remoteDataSource: WeatherRemoteDataSource,
     private val localDataSource: WeatherLocalDataSource
@@ -22,7 +20,6 @@ class WeatherRepositoryImp(
         language: String,
         unit: String
     ): Flow<CurrentWeatherResponse> {
-        Log.e(TAG, "getCurrentWeather: $lat , $lon", )
         return remoteDataSource.getCurrentWeather(lat, lon, language, unit)
     }
 
