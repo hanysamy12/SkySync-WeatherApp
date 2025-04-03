@@ -5,7 +5,7 @@ import com.example.skysync.data.local.WeatherLocalDataSource
 import com.example.skysync.data.remote.WeatherRemoteDataSource
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
-import com.example.skysync.models.SearchLocationsResponse
+import com.example.skysync.models.SearchLocationsResponseItem
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 
@@ -35,7 +35,7 @@ class WeatherRepositoryImp(
         return remoteDataSource.getForecast(lat, lon, language, unit)
     }
 
-    override suspend fun searchLocation(searchQuery: String): Flow<SearchLocationsResponse> {
+    override suspend fun searchLocation(searchQuery: String): Flow<List<SearchLocationsResponseItem>> {
         return remoteDataSource.searchForLocation(searchQuery)
     }
 

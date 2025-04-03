@@ -11,22 +11,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.toRoute
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.skysync.alerts.view.AlertsScreen
 import com.example.skysync.alerts.viewmodel.AlertViewModelFactory
@@ -41,8 +46,6 @@ import com.example.skysync.favorite.viewmodel.FavoriteViewModelImp
 import com.example.skysync.favorite.viewmodel.FavoriteViwModelFactory
 import com.example.skysync.helper.Constants
 import com.example.skysync.helper.MyNotifications
-import com.example.skysync.helper.MyNotifications.PermissionHelper
-import com.example.skysync.helper.MyWorkManager
 import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
@@ -60,7 +63,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 private const val TAG = "MainActivity"
 
@@ -70,31 +72,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //////////
-     //   PermissionHelper.checkNotificationPermission(this)
-        ////////
-/*        val workManager = WorkManager.getInstance(this@MainActivity)
-        val request =
-            OneTimeWorkRequestBuilder<MyWorkManager>().addTag(Constants.MY_WORK_MANAGER_TAG)
-                .setInitialDelay(10,TimeUnit.SECONDS).build()
-        workManager.enqueue(request)*/
-        /*  workManager.getWorkInfoByIdLiveData(request.id).observe(this, Observer { workInfo ->
-              when (workInfo?.state) {
-                  WorkInfo.State.SUCCEEDED -> {
-                      Log.i(TAG, "Main Got : $workInfo")
-                      try {
 
-                      } catch (e: IOException) {
-                          Log.e(TAG, "Got From File Error: $e")
-                      }
-                  }
-                  else -> {
-                      Log.e(TAG, "Main Failed ${workInfo?.state}")
-                  }
-              }
-          })*/
-
-        ////////////
         val dataStoreRepo = DataStoreRepositoryImp(this.application)
         lifecycleScope.launch {
             changeLocal(dataStoreRepo, this@MainActivity)
@@ -124,11 +102,15 @@ class MainActivity : ComponentActivity() {
             )
         )[FavoriteViewModelImp::class.java]
 
-        val alertViewModel = ViewModelProvider(this, AlertViewModelFactory(MyNotifications(this),
-            WorkManager.getInstance(this@MainActivity),this@MainActivity))[AlertViewModelImp::class.java]
+        val alertViewModel = ViewModelProvider(
+            this, AlertViewModelFactory(
+                MyNotifications(this),
+                WorkManager.getInstance(this@MainActivity), this@MainActivity
+            )
+        )[AlertViewModelImp::class.java]
         setContent {
             SkySyncTheme {
-                MainScreen(homeViewModel, settingsViewModel, favoriteViewModel,alertViewModel)
+                MainScreen(homeViewModel, settingsViewModel, favoriteViewModel, alertViewModel)
 
             }
 
@@ -163,52 +145,72 @@ fun MainScreen(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-        Box(modifier = Modifier.height(60.dp)) {
-            BottomNavigationBar((navController))
-        }
-        Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
-    }, floatingActionButton = {
+    val snackBarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState)},
+        bottomBar = {
+            Box(modifier = Modifier.height(60.dp)) {
+                BottomNavigationBar((navController))
+            }
+            Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
+        },
+        floatingActionButton = {
 
-        if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
-            navController.navigate(
-                ScreenRoute.GoogleMap
-            )
-        }) {
-            Icon(
-                painter = painterResource(R.drawable.ic_heart),
-                contentDescription = "add location"
-            )
-        }
-    }
-
+            if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
+                navController.navigate(
+                    ScreenRoute.GoogleMap(Constants.FAVORITE_SCREEN)
+                )
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_heart),
+                    contentDescription = "add location"
+                )
+            }
+        },
     ) { contentPadding ->
         NavHost(
             navController = navController,
-            startDestination = ScreenRoute.Home.route,
+            startDestination = ScreenRoute.Home().route,
             modifier = Modifier.padding(contentPadding)
 
         ) {
-            composable(route = ScreenRoute.Home.route) {
-                HomeScreen(homeViewModel)
+            composable(
+                route = "home/{lat}/{lon}",
+                arguments = listOf(
+                    navArgument("lat") { type = NavType.StringType; nullable = true },
+                    navArgument("lon") { type = NavType.StringType; nullable = true }
+                )
+            ) { navBackStackEntry ->
+                val lat = navBackStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
+                val lon = navBackStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
+
+                HomeScreen(homeViewModel, lat, lon)
             }
             composable(route = ScreenRoute.Favorite.route) {
-                FavoriteScreen(favoriteViewModel, navController)
+                FavoriteScreen(favoriteViewModel, navController, snackBarHostState)
             }
             composable(route = ScreenRoute.Alerts.route) {
                 AlertsScreen(alertViewModelImp)
             }
             composable(route = ScreenRoute.Settings.route) {
-                SettingsScreen(settingsViewModel)
+                SettingsScreen(settingsViewModel, navController)
             }
-            composable<ScreenRoute.GoogleMap> {
-                MapScreen(favoriteViewModel, navController)
+            composable<ScreenRoute.GoogleMap> { navBackStackEntry ->
+                val preRoute = navController.previousBackStackEntry?.destination?.route
+                val sourceScreen = when (preRoute) {
+                    ScreenRoute.Favorite.route -> Constants.FAVORITE_SCREEN
+                    ScreenRoute.Settings.route -> Constants.SETTINGS_SCREEN
+                    else -> Constants.FAVORITE_SCREEN
+                }
+                MapScreen(favoriteViewModel, navController, sourceScreen = sourceScreen)
             }
             composable<ScreenRoute.FavoriteDetails> { navBackStackEntry ->
                 val data = navBackStackEntry.toRoute<ScreenRoute.FavoriteDetails>()
                 FavoriteDetailsScreen(homeViewModel, data.lat, data.lon)
             }
         }
+
     }
 }
 

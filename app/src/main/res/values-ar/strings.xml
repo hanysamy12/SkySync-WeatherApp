@@ -31,4 +31,5 @@
     <string name="Wainting_message">Prepending Every Thing For You</string>
     <string name="no_location_selected">No Location Selected</string>
     <string name="add_to_favorite">Add To Favorite</string>
+    <string name="go_to_home">Go To Home</string>
 </resources>

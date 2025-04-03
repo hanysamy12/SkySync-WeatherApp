@@ -7,8 +7,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -26,7 +29,7 @@ private const val TAG = "BottomNavigationBar"
 @Serializable
 sealed class ScreenRoute(val route: String) {
     @Serializable
-    object Home : ScreenRoute("home")
+    data class Home(val lat: Double? = null, val lon: Double? = null) : ScreenRoute("home/$lat?/$lon?")
     @Serializable
     object Favorite : ScreenRoute("favorite")
     @Serializable
@@ -34,17 +37,17 @@ sealed class ScreenRoute(val route: String) {
     @Serializable
     object Settings : ScreenRoute("settings")
     @Serializable
-    object GoogleMap : ScreenRoute("googleMap")
+    data class GoogleMap(val sourceRoute : Int) : ScreenRoute("googleMap")
     @Serializable
     data class FavoriteDetails( val lat: Double, val lon: Double) : ScreenRoute("favoriteDetails")
 
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController,) {
 
     val navigationItems = listOf(
-        NavigationItem(stringResource(R.string.home), painterResource(R.drawable.ic_home), ScreenRoute.Home.route),
+        NavigationItem(stringResource(R.string.home), painterResource(R.drawable.ic_home), ScreenRoute.Home().route),
         NavigationItem(
             stringResource(R.string.favorite), painterResource(R.drawable.ic_heart), ScreenRoute.Favorite.route
         ),
@@ -53,26 +56,28 @@ fun BottomNavigationBar(navController: NavController) {
             stringResource(R.string.settings), painterResource(R.drawable.ic_settings), ScreenRoute.Settings.route
         )
     )
-    val selectedNavigationIndex = rememberSaveable { mutableIntStateOf(0) }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    LaunchedEffect(currentRoute) {
-        val index = navigationItems.indexOfFirst { it.route == currentRoute }
-        if (index != -1) {
-            selectedNavigationIndex.intValue = index
-        }
+    val selectedNavigationIndex = remember(currentRoute) {
+        navigationItems.indexOfFirst { item ->
+            when {
+                item.route == ScreenRoute.Home().route -> currentRoute?.startsWith("home") == true
+                else -> currentRoute == item.route
+            }
+        }.takeIf { it >= 0 } ?: 0
     }
     NavigationBar(containerColor = MaterialTheme.colorScheme.primary) {
         navigationItems.forEachIndexed { index, item ->
-            NavigationBarItem(selected = selectedNavigationIndex.intValue == index, onClick = {
-                selectedNavigationIndex.intValue = index
+            NavigationBarItem(selected = selectedNavigationIndex == index, onClick = {
                 navController.navigate(item.route) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
+                    restoreState =true
                 }
             }, icon = { Icon(painter = item.icon, contentDescription = item.title) }, label = {
-                if (index == selectedNavigationIndex.intValue) {
+                if (index == selectedNavigationIndex) {
                     Text(
                         item.title
                     )

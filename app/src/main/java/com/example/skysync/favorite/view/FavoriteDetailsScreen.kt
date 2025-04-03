@@ -34,18 +34,17 @@ import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 //@Preview()
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon: Double) {
+fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp, lat: Double, lon: Double) {
     val fahrenheitSymbol = stringResource(R.string.fahrenheit_symbol)
     val celsiusSymbol = stringResource(R.string.celsius_symbol)
     val kelvinSymbol = stringResource(R.string.kelvin_symbol)
     val mileSymbol = stringResource(R.string.miles_hour)
     val meterSymbol = stringResource(R.string.meter_sec)
-
     var lang = rememberSaveable { mutableStateOf("") }
     var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
     var windUnit = rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(lat,lon) {
-        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadFavoriteInitialValues(lat,lon)
+    LaunchedEffect(lat, lon) {
+        val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues(lat, lon)
         lang.value = language
         windUnit.value = when (windSpeedUnit) {
             "mile" -> mileSymbol
@@ -62,8 +61,7 @@ fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon:
     val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
 
-    //val language = viewModel.
-    Box(Modifier.fillMaxSize(),) {
+    Box(Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.bg_home),
             contentDescription = "background Image",
@@ -73,7 +71,6 @@ fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon:
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                //.background(gradientBrush)
                 .padding(10.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -103,14 +100,7 @@ fun FavoriteDetailsScreen(viewModel: CurrentWeatherViewModelImp,lat: Double,lon:
                             //  ProgressShow()
                         }
                     }
-                    //////
-                    /*val currentWeather = (uiWeatherState as Response.Success).data
-                    CurrentWeatherShow(
-                        currentWeather,
-                        lang.value,
-                        tempUnitSymbol.value,
-                        windUnit.value
-                    )*/
+
                 }
 
                 is Response.Failure -> {
