@@ -30,8 +30,10 @@
     <string name="alerts">Alerts</string>
     <string name="settings">Settings</string>
     <string name="favorite">Favorite</string>
-    <string name="Wainting_message">Prepending Every Thing For You</string>
+    <string name="Waiting_message">Negotiating with the wind for accurate results.</string>
     <string name="no_location_selected">No Location Selected</string>
     <string name="add_to_favorite">Add To Favorite</string>
     <string name="go_to_home">Show Details</string>
+    <string name="title_activity_notification_activity">NotificationActivity</string>
+    <string name="set_location">Set Location</string>
 </resources>
