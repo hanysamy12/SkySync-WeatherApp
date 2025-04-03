@@ -127,14 +127,6 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp,lat : Double? ,lon: Double?
                             //  ProgressShow()
                         }
                     }
-                    //////
-                    /*val currentWeather = (uiWeatherState as Response.Success).data
-                    CurrentWeatherShow(
-                        currentWeather,
-                        lang.value,
-                        tempUnitSymbol.value,
-                        windUnit.value
-                    )*/
                 }
 
                 is Response.Failure -> {
@@ -146,24 +138,6 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp,lat : Double? ,lon: Double?
                     ProgressShow()
                 }
             }
-
-            //  }
-
-            /*when (uiForecastState) {
-                is Response.Success -> {
-                    val forecast = (uiForecastState as Response.Success).data
-                    ForecastShow(forecast, lang.value, tempUnitSymbol.value)
-                }
-
-                is Response.Failure -> {
-                    val msg = (uiForecastState as Response.Failure).toString()
-                    MessageShow(msg)
-                }
-
-                is Response.Loading -> {
-                    //  ProgressShow()
-                }
-            }*/
 
         }
     }
@@ -211,7 +185,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp,lat : Double? ,lon: Double?
                     modifier = Modifier
                         .fillMaxHeight()
                         .weight(1f),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.End
                 ) {
                     val temp = if (lang == "ar") {
                         numEnToAr(
