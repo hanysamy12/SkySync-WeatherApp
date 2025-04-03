@@ -38,6 +38,7 @@ class FavoriteViewModelImp(
         MutableStateFlow<Response<List<StoredLocation>>>(Response.Loading)
     val favoriteList: StateFlow<Response<List<StoredLocation>>> = mutableFavoriteList
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
+
     override suspend fun addFavoriteLocation(latLng: LatLng?) {
         val locationName =
             location.getGeoLocation(latLng?.latitude ?: 0.0, latLng?.longitude ?: 0.0)
@@ -59,7 +60,7 @@ class FavoriteViewModelImp(
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val searchResult : StateFlow<List<SearchLocationsResponseItem>> = mutableSearchFlow
+    val searchResult: StateFlow<List<SearchLocationsResponseItem>> = mutableSearchFlow
         .debounce(300)
         .distinctUntilChanged()
         .flatMapLatest { query ->
@@ -75,14 +76,16 @@ class FavoriteViewModelImp(
                     }
             }
 
-        }.stateIn(scope = viewModelScope,
+        }.stateIn(
+            scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList())
+            initialValue = emptyList()
+        )
 
 
     override fun deleteFavoriteLocation(storedLocation: StoredLocation) {
         viewModelScope.launch {
-           val result = weatherRepository.deleteFavoriteLocation(storedLocation)
+            val result = weatherRepository.deleteFavoriteLocation(storedLocation)
             Log.i(TAG, "deleteFavoriteLocation: $result")
         }
     }

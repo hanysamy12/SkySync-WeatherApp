@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class WeatherLocalDataSourceImpTest {
-
     private lateinit var dao: LocationsDAO
     private lateinit var dataBase: DataBase
     private lateinit var localDataSource: WeatherLocalDataSource
@@ -32,7 +31,6 @@ class WeatherLocalDataSourceImpTest {
         localDataSource =
             WeatherLocalDataSourceImp.getInstance(ApplicationProvider.getApplicationContext()) as WeatherLocalDataSourceImp
     }
-
     @Test
     fun insertLocation_getAllLocations_returnsInsertedLocation() = runTest {
         //Given
