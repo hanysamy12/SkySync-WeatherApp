@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -18,19 +19,9 @@ class WeatherRepositoryImpTest {
     private lateinit var fakeLocalDataSource: FakeLocalDataSource
     private lateinit var repository: WeatherRepositoryImp
 
-    @Before
-    fun setUp() {
-
-        mockkStatic(Log::class)
-        every { Log.e(any(), any()) } returns 0
-        fakeLocalDataSource = FakeLocalDataSource()
-        fakeRemoteDateSource = FakeRemoteDateSource()
-        repository = WeatherRepositoryImp(fakeRemoteDateSource, fakeLocalDataSource)
-    }
-
 
     @Test
-    fun getFavoriteLocations_returnsStoredLocations() = runBlocking {
+    fun getFavoriteLocations_returnsStoredLocations() = runTest {
         // Given
         val storedLocation =
             StoredLocation(id = 1, name = "Giza", lat = 29.3845479, lon = 30.458794)
@@ -46,7 +37,7 @@ class WeatherRepositoryImpTest {
     }
 
     @Test
-    fun deleteFavoriteLocation_removesLocation() = runBlocking {
+    fun deleteFavoriteLocation_removesLocation() = runTest {
         // Given
         val storedLocation =
             StoredLocation(id = 1, name = "Giza", lat = 29.3845479, lon = 30.458794)
@@ -60,13 +51,22 @@ class WeatherRepositoryImpTest {
         assertThat(result.size, `is`(0))
     }
     @Test
-    fun getCurrentWeather_returnsExpectedWeatherData() = runBlocking {
+    fun getCurrentWeather_returnsExpectedWeatherData() = runTest {
         // Given
         val expectedWeather = fakeRemoteDateSource.currentWeatherResponse
         // When
         val result = repository.getCurrentWeather(0.0, 0.0, "en", "metric").first()
         // Then
         assertThat(result, `is`(expectedWeather))
+    }
+
+    @Before
+    fun setUp() {
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
+        fakeLocalDataSource = FakeLocalDataSource()
+        fakeRemoteDateSource = FakeRemoteDateSource()
+        repository = WeatherRepositoryImp(fakeRemoteDateSource, fakeLocalDataSource)
     }
 
 }

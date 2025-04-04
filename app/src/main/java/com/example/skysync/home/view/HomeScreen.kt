@@ -36,12 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.ImageDecoderDecoder
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.skysync.R
@@ -55,9 +59,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
-import kotlin.text.toDouble
 
-private const val TAG = "HomeScreen"
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?) {
@@ -90,7 +93,15 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
 
     Box(Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.bg_home),
+            painter = rememberAsyncImagePainter(
+                R.drawable.bg_simple_stars,
+                imageLoader = ImageLoader(LocalContext.current).newBuilder()
+                    .components {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            add(ImageDecoderDecoder.Factory())
+                        }
+                    }
+                    .build()),
             contentDescription = "background Image",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -187,27 +198,30 @@ fun CurrentWeatherShow(
                         Text("${currentDateTimePair.first}  ", fontSize = 16.sp)
                     }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    val temp = if (lang == "ar") {
-                        numEnToAr(
-                            (currentWeather?.main?.feelsLike
-                                ?: currentWeather?.main?.temp).toString().toDouble().roundToInt().toString()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        val temp = if (lang == "ar") {
+                            numEnToAr(
+                                (currentWeather?.main?.feelsLike
+                                    ?: currentWeather?.main?.temp).toString().toDouble()
+                                    .roundToInt().toString()
+                            )
+                        } else {
+                            currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp.toString()
+                                .toDouble().roundToInt().toString()
+                        }
+                        Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 16.sp)
+                        Text(
+                            "${stringResource(R.string.feels)} $temp",
+                            fontSize = 12.sp
                         )
-                    } else {
-                        currentWeather?.main?.feelsLike ?: currentWeather?.main?.temp.toString().toDouble().roundToInt().toString()
                     }
-                    Text("${currentWeather?.weather?.get(0)?.description}", fontSize = 16.sp)
-                    Text(
-                        "${stringResource(R.string.feels)} $temp",
-                        fontSize = 12.sp
-                    )
                 }
-            }}
+            }
             Column {
                 Row(
                     modifier = Modifier
@@ -217,7 +231,9 @@ fun CurrentWeatherShow(
                     verticalAlignment = Alignment.Top
                 ) {
                     val temp = if (lang == "ar") {
-                        numEnToAr(currentWeather?.main?.temp.toString().toDouble().roundToInt().toString())
+                        numEnToAr(
+                            currentWeather?.main?.temp.toString().toDouble().roundToInt().toString()
+                        )
                     } else {
                         currentWeather?.main?.temp.toString().toDouble().roundToInt().toString()
                     }
@@ -543,7 +559,9 @@ fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
 @Composable
 fun ProgressShow() {
     Column(
-        Modifier.fillMaxSize().padding(16.dp),
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

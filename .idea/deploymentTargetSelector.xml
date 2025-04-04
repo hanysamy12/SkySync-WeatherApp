@@ -8,7 +8,10 @@
       <SelectionState runConfigName="WeatherLocalDataSourceImpTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="LocationsDAOTest">
+      <SelectionState runConfigName="insertLocation_getAllLocations_returnsInsertedLocation()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="deleteLocation_locationIsRemoved()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

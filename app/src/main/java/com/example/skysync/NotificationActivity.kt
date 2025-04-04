@@ -36,7 +36,8 @@ class NotificationActivity : ComponentActivity() {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 })
                 finish()
-            }  })
+            }
+        })
         Log.i(TAG, "NotificationActivity: Lat = $receivedLat /// Lon = $receivedLon")
         val homeViewModel = ViewModelProvider(
             this, HomeViewModelFactory(

@@ -11,23 +11,19 @@ import com.example.skysync.models.SearchLocationsResponseItem
 import com.example.skysync.models.StoredLocation
 import com.example.skysync.repo.WeatherRepository
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 private const val TAG = "FavoriteViewModelImp"
 
+@OptIn(FlowPreview::class)
 class FavoriteViewModelImp(
     private val weatherRepository: WeatherRepository,
     private val location: Location
@@ -38,6 +34,7 @@ class FavoriteViewModelImp(
         MutableStateFlow<Response<List<StoredLocation>>>(Response.Loading)
     val favoriteList: StateFlow<Response<List<StoredLocation>>> = mutableFavoriteList
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
+
     override suspend fun addFavoriteLocation(latLng: LatLng?) {
         val locationName =
             location.getGeoLocation(latLng?.latitude ?: 0.0, latLng?.longitude ?: 0.0)
@@ -49,40 +46,31 @@ class FavoriteViewModelImp(
         }
     }
 
-    private val mutableSearchQuery = MutableStateFlow("")
-    private val mutableSearchFlow = MutableSharedFlow<String>(replay = 1)
-    val searchQuery: StateFlow<String> = mutableSearchQuery
 
-    override fun updateQuery(query: String) {
-        mutableSearchQuery.value = query
-        viewModelScope.launch { mutableSearchFlow.emit(query) }
+
+    private val mutableSearchQuery: MutableSharedFlow<String> =
+        MutableSharedFlow<String>(replay = 1)
+    private val mutableSearchResult: MutableStateFlow<List<SearchLocationsResponseItem>> = MutableStateFlow(emptyList())
+    val searchResult = mutableSearchResult.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            mutableSearchQuery.debounce(900)
+                .distinctUntilChanged().collect { query ->
+                    searchLocation(query)
+                }
+        }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val searchResult : StateFlow<List<SearchLocationsResponseItem>> = mutableSearchFlow
-        .debounce(300)
-        .distinctUntilChanged()
-        .flatMapLatest { query ->
-            if (query.isEmpty()) {
-                flowOf(emptyList())
-            } else {
-                weatherRepository.searchLocation(query).onEach {
-                    Log.d(TAG, " returned: ///////$it")
-                }
-                    .catch { e ->
-                        Log.e(TAG, "Search error: ${e.message}")
-                        emit(emptyList())
-                    }
-            }
+    override fun updateQuery(query: String) {
+        viewModelScope.launch { mutableSearchQuery.emit(query) }
+    }
 
-        }.stateIn(scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList())
 
 
     override fun deleteFavoriteLocation(storedLocation: StoredLocation) {
         viewModelScope.launch {
-           val result = weatherRepository.deleteFavoriteLocation(storedLocation)
+            val result = weatherRepository.deleteFavoriteLocation(storedLocation)
             Log.i(TAG, "deleteFavoriteLocation: $result")
         }
     }
@@ -102,8 +90,13 @@ class FavoriteViewModelImp(
 
     override suspend fun searchLocation(searchQuery: String) {
         Log.i(TAG, "searchLocation: //////")
+        try {
+
         weatherRepository.searchLocation(searchQuery).collect { locations ->
             Log.i(TAG, "searchLocation: $locations")
+            mutableSearchResult.value = locations
+        }}catch (e: Exception){
+            Log.e(TAG, "searchLocation: ${e.message}", )
         }
     }
 }
