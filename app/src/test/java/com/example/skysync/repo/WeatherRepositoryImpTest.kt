@@ -19,15 +19,6 @@ class WeatherRepositoryImpTest {
     private lateinit var fakeLocalDataSource: FakeLocalDataSource
     private lateinit var repository: WeatherRepositoryImp
 
-    @Before
-    fun setUp() {
-        mockkStatic(Log::class)
-        every { Log.e(any(), any()) } returns 0
-        fakeLocalDataSource = FakeLocalDataSource()
-        fakeRemoteDateSource = FakeRemoteDateSource()
-        repository = WeatherRepositoryImp(fakeRemoteDateSource, fakeLocalDataSource)
-    }
-
 
     @Test
     fun getFavoriteLocations_returnsStoredLocations() = runTest {
@@ -67,6 +58,15 @@ class WeatherRepositoryImpTest {
         val result = repository.getCurrentWeather(0.0, 0.0, "en", "metric").first()
         // Then
         assertThat(result, `is`(expectedWeather))
+    }
+
+    @Before
+    fun setUp() {
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
+        fakeLocalDataSource = FakeLocalDataSource()
+        fakeRemoteDateSource = FakeRemoteDateSource()
+        repository = WeatherRepositoryImp(fakeRemoteDateSource, fakeLocalDataSource)
     }
 
 }

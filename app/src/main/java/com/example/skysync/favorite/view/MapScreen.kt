@@ -67,7 +67,7 @@ fun MapScreen(
     var buttonEnabled by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
     val locations by viewModel.searchResult.collectAsState()
     var locationSelected by remember { mutableStateOf(false) }
     Box(
@@ -109,6 +109,7 @@ fun MapScreen(
                 OutlinedTextField(
                     value = searchQuery, onValueChange = { query ->
                         viewModel.updateQuery(query)
+                        searchQuery = query
                         locationSelected = false
                      //   Log.i(TAG, "MapScreen: $query")
                     },
