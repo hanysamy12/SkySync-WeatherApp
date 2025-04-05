@@ -46,11 +46,10 @@ class FavoriteViewModelImp(
         }
     }
 
-
-
     private val mutableSearchQuery: MutableSharedFlow<String> =
         MutableSharedFlow<String>(replay = 1)
-    private val mutableSearchResult: MutableStateFlow<List<SearchLocationsResponseItem>> = MutableStateFlow(emptyList())
+    private val mutableSearchResult: MutableStateFlow<List<SearchLocationsResponseItem>> =
+        MutableStateFlow(emptyList())
     val searchResult = mutableSearchResult.asStateFlow()
 
     init {
@@ -66,7 +65,9 @@ class FavoriteViewModelImp(
         viewModelScope.launch { mutableSearchQuery.emit(query) }
     }
 
-
+    override fun clearSearchScreen() {
+        mutableSearchResult.value=emptyList()
+    }
 
     override fun deleteFavoriteLocation(storedLocation: StoredLocation) {
         viewModelScope.launch {
@@ -89,14 +90,14 @@ class FavoriteViewModelImp(
     }
 
     override suspend fun searchLocation(searchQuery: String) {
-        Log.i(TAG, "searchLocation: //////")
+        //Log.i(TAG, "searchLocation: //////")
         try {
-
-        weatherRepository.searchLocation(searchQuery).collect { locations ->
-            Log.i(TAG, "searchLocation: $locations")
-            mutableSearchResult.value = locations
-        }}catch (e: Exception){
-            Log.e(TAG, "searchLocation: ${e.message}", )
+            weatherRepository.searchLocation(searchQuery).collect { locations ->
+                Log.i(TAG, "searchLocation: $locations")
+                mutableSearchResult.value = locations
+            }
+        } catch (e: Exception) {
+            // Log.e(TAG, "searchLocation: ${e.message}", )
         }
     }
 }

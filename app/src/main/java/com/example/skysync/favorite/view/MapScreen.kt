@@ -85,7 +85,8 @@ fun MapScreen(
                 buttonEnabled = true
                 lat = latLon.latitude
                 lon = latLon.longitude
-                Log.i(TAG, "MapScreen: ${latLon.latitude } //// ${latLon.longitude}")
+                //Log.i(TAG, "MapScreen: ${latLon.latitude } //// ${latLon.longitude}")
+                viewModel.clearSearchScreen()
             },
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true,
@@ -94,7 +95,7 @@ fun MapScreen(
         ) {
             Marker(
                 state = MarkerState(position = LatLng(lat, lon)),
-                title = stringResource(R.string.current_location),
+                title = "Current Weather",
             )
 
         }
@@ -117,7 +118,7 @@ fun MapScreen(
                         .fillMaxWidth()
                         .height(60.dp),
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text(stringResource(R.string.search)) },
+                    label = { Text("Search...") },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
                     },
@@ -195,7 +196,11 @@ fun MapScreen(
                     onClick = {
                         navController.popBackStack()
                         alertViewModel.setLatLon(lat ,lon)
-
+                        /*navController.navigate(ScreenRoute.Alerts) {
+                            popUpTo(ScreenRoute.Alerts.route) {
+                                inclusive = false
+                            }
+                        }*/
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.elevatedButtonColors(

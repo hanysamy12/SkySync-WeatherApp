@@ -23,7 +23,8 @@ class MyWorkManager(private val context: Context, workerParams: WorkerParameters
             val lon = inputData.getDouble(Constants.NOTIFICATION_LOCATION_LON, 0.0)
             val notification = MyNotifications(context)
             notification.sendNotification(alertId,isAlarm, lat, lon)
-            Log.d("notificationId", "WorkManager $id  ///${id.javaClass.name}")
+           // Log.d("notificationId", "WorkManager $id  ///${id.javaClass.name}")
+            Log.i("Alert", "doWork: Lat $lat Lon $lon")
             return Result.success()
 
         } catch (e: Exception) {
