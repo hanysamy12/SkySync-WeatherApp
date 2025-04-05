@@ -54,6 +54,7 @@ import com.example.skysync.settings.view.SettingsScreen
 import com.example.skysync.settings.viewmodel.SettingsViewModel
 import com.example.skysync.settings.viewmodel.SettingsViewModelFactory
 import com.example.skysync.settings.viewmodel.SettingsViewModelImp
+import com.example.skysync.ui.MainScreen
 import com.example.skysync.ui.navigation.BottomNavigationBar
 import com.example.skysync.ui.navigation.ScreenRoute
 import com.example.skysync.ui.theme.SkySyncTheme
@@ -62,7 +63,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-private const val TAG = "MainActivity"
+internal const val TAG = "MainActivity"
 
 
 class MainActivity : ComponentActivity() {
@@ -134,91 +135,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-}
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun MainScreen(
-    homeViewModel: CurrentWeatherViewModelImp,
-    settingsViewModel: SettingsViewModel,
-    favoriteViewModel: FavoriteViewModelImp,
-    alertViewModelImp: AlertViewModelImp
-) {
-    val navController = rememberNavController()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
-    val snackBarHostState = remember { SnackbarHostState() }
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        bottomBar = {
-            Box(modifier = Modifier.height(60.dp)) {
-                BottomNavigationBar((navController))
-            }
-            Log.i(TAG, "MainScreen: CurrentRoute  $currentRoute")
-        },
-        floatingActionButton = {
-
-            if (currentRoute == ScreenRoute.Favorite.route) FloatingActionButton(onClick = {
-                navController.navigate(
-                    ScreenRoute.GoogleMap(Constants.FAVORITE_SCREEN)
-                )
-            }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_heart),
-                    contentDescription = "add location"
-                )
-            }
-        },
-    ) { contentPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = ScreenRoute.Home().route,
-            modifier = Modifier.padding(contentPadding)
-
-        ) {
-            composable(
-                route = "home/{lat}/{lon}",
-                arguments = listOf(
-                    navArgument("lat") { type = NavType.StringType; nullable = true },
-                    navArgument("lon") { type = NavType.StringType; nullable = true }
-                )
-            ) { navBackStackEntry ->
-                val lat = navBackStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
-                val lon = navBackStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                HomeScreen(homeViewModel, lat, lon)
-            }
-            composable(route = ScreenRoute.Favorite.route) {
-                FavoriteScreen(favoriteViewModel, navController, snackBarHostState)
-            }
-            composable(route = ScreenRoute.Alerts.route) {
-                AlertsScreen(alertViewModelImp, navController)
-            }
-            composable(route = ScreenRoute.Settings.route) {
-                SettingsScreen(settingsViewModel, navController)
-            }
-            composable<ScreenRoute.GoogleMap> { navBackStackEntry ->
-                val preRoute = navController.previousBackStackEntry?.destination?.route
-                val sourceScreen = when (preRoute) {
-                    ScreenRoute.Favorite.route -> Constants.FAVORITE_SCREEN
-                    ScreenRoute.Settings.route -> Constants.SETTINGS_SCREEN
-                    ScreenRoute.Alerts.route -> Constants.ALERTS_SCREEN
-                    else -> Constants.FAVORITE_SCREEN
-                }
-                MapScreen(
-                    favoriteViewModel,
-                    alertViewModelImp,
-                    navController,
-                    sourceScreen = sourceScreen
-                )
-            }
-            composable<ScreenRoute.FavoriteDetails> { navBackStackEntry ->
-                val data = navBackStackEntry.toRoute<ScreenRoute.FavoriteDetails>()
-                FavoriteDetailsScreen(homeViewModel, data.lat, data.lon)
-            }
-        }
-
-    }
 }
 
