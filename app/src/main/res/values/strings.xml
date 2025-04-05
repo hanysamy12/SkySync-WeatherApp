@@ -36,4 +36,15 @@
     <string name="go_to_home">Show Details</string>
     <string name="title_activity_notification_activity">NotificationActivity</string>
     <string name="set_location">Set Location</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="select_time">Select Time</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="pick_location">" Pick Location "</string>
+    <string name="set_alert">Set Alert</string>
+    <string name="add_new_alarm">Add New Alarm</string>
+    <string name="save">Save</string>
+    <string name="current_location">Current Location</string>
+    <string name="search">Search</string>
 </resources>

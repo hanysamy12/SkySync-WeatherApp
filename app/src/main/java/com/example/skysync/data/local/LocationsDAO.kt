@@ -14,7 +14,7 @@ interface LocationsDAO {
     @Query("SELECT * FROM locations")
     fun getAllLocations() : Flow<List<StoredLocation>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = IGNORE)
     suspend fun insertLocation(storedLocation: StoredLocation): Long
 
     @Delete

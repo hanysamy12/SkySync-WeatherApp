@@ -34,5 +34,16 @@
     <string name="go_to_home">الانتقال إلى الرئيسية</string>
     <string name="set_location">تحديد الموقع</string>
     <string name="title_activity_notification_activity">صفحه الإشعارات</string>
+    <string name="cancel">إلغاء</string>
+    <string name="ok">موافق</string>
+    <string name="select_time">تحديد الوقت</string>
+    <string name="alarm">منبه</string>
+    <string name="notification">إشعار</string>
+    <string name="pick_location">اختيار الموقع</string>
+    <string name="set_alert">تعيين تنبيه</string>
+    <string name="add_new_alarm">إضافة منبه جديد</string>
+    <string name="save">حفظ</string>
+    <string name="current_location">الموقع الحالي</string>
+    <string name="search">بحث</string>
 
 </resources>

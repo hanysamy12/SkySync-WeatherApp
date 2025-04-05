@@ -8,6 +8,6 @@ interface FavoriteViewModel {
     fun deleteFavoriteLocation(storedLocation: StoredLocation)
     suspend fun getAllFavoriteLocations()
     suspend fun searchLocation(searchQuery: String)
-
     fun updateQuery(query : String)
+    fun clearSearchScreen()
 }
