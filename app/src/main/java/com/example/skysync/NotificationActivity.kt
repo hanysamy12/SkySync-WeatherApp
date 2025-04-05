@@ -23,7 +23,6 @@ import com.example.skysync.ui.theme.SkySyncTheme
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-private const val TAG = "NotificationActivity"
 
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
