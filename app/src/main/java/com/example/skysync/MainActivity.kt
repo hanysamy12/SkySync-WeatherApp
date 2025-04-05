@@ -2,7 +2,6 @@ package com.example.skysync
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Network
 import android.os.Build
 import android.os.Bundle
 import android.util.Log

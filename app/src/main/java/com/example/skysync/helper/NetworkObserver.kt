@@ -16,7 +16,6 @@ class NetworkObserver(context: Context) {
             //Log.i(TAG, "onCreate: No Internet ONStart")
             mutableNetworkStatus.value = NetworkStatus.Lost
 
-
         }
         connectivityManager.registerDefaultNetworkCallback(object :
             ConnectivityManager.NetworkCallback() {
