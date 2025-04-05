@@ -85,7 +85,8 @@ fun MapScreen(
                 buttonEnabled = true
                 lat = latLon.latitude
                 lon = latLon.longitude
-                Log.i(TAG, "MapScreen: ${latLon.latitude } //// ${latLon.longitude}")
+                //Log.i(TAG, "MapScreen: ${latLon.latitude } //// ${latLon.longitude}")
+                viewModel.clearSearchScreen()
             },
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true,
@@ -95,7 +96,6 @@ fun MapScreen(
             Marker(
                 state = MarkerState(position = LatLng(lat, lon)),
                 title = "Current Weather",
-                snippet = "Tap for details"
             )
 
         }
