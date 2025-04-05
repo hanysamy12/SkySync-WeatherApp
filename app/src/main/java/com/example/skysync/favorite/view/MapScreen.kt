@@ -118,7 +118,7 @@ fun MapScreen(
                         .fillMaxWidth()
                         .height(60.dp),
                     shape = RoundedCornerShape(16.dp),
-                    label = { Text("Search...") },
+                    label = { stringResource(R.string.search) },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
                     },
@@ -196,11 +196,7 @@ fun MapScreen(
                     onClick = {
                         navController.popBackStack()
                         alertViewModel.setLatLon(lat ,lon)
-                        /*navController.navigate(ScreenRoute.Alerts) {
-                            popUpTo(ScreenRoute.Alerts.route) {
-                                inclusive = false
-                            }
-                        }*/
+
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.elevatedButtonColors(
