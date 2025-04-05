@@ -1,7 +1,6 @@
 package com.example.skysync.home.view
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,6 +75,8 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
     var lang = rememberSaveable { mutableStateOf("") }
     var tempUnitSymbol = rememberSaveable { mutableStateOf("") }
     var windUnit = rememberSaveable { mutableStateOf("") }
+
+    var showMessage by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         val (language, temperatureUnit, windSpeedUnit) = viewModel.loadInitialValues(lat, lon)
         lang.value = language
@@ -91,7 +94,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
     }
     val uiWeatherState by viewModel.weather.collectAsStateWithLifecycle()
     val uiForecastState by viewModel.forecast.collectAsStateWithLifecycle()
-
+    val uiConnectionState by viewModel.showConnectionLost.collectAsStateWithLifecycle()
     Box(Modifier.fillMaxSize()) {
         Image(
             painter = rememberAsyncImagePainter(
@@ -107,50 +110,62 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            when (uiWeatherState) {
-                is Response.Success -> {
-                    ///////
-                    when (uiForecastState) {
-                        is Response.Success -> {
-                            val forecast = (uiForecastState as Response.Success).data
-                            val currentWeather = (uiWeatherState as Response.Success).data
-                            CurrentWeatherShow(
-                                currentWeather,
-                                lang.value,
-                                tempUnitSymbol.value,
-                                windUnit.value
-                            )
-                            ForecastShow(forecast, lang.value, tempUnitSymbol.value)
-                        }
+        Column(Modifier.fillMaxSize()) {
 
-                        is Response.Failure -> {
-                            val msg = (uiForecastState as Response.Failure).toString()
-                            MessageShow(msg)
-                        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
 
-                        is Response.Loading -> {
+                when (uiWeatherState) {
+                    is Response.Success -> {
+                        when (uiForecastState) {
+                            is Response.Success -> {
+                                val forecast = (uiForecastState as Response.Success).data
+                                val currentWeather = (uiWeatherState as Response.Success).data
+                                CurrentWeatherShow(
+                                    currentWeather,
+                                    lang.value,
+                                    tempUnitSymbol.value,
+                                    windUnit.value
+                                )
+                                ForecastShow(forecast, lang.value, tempUnitSymbol.value)
+                            }
+
+                            is Response.Failure -> {
+                                val msg = (uiForecastState as Response.Failure).toString()
+                                MessageShow(msg)
+                            }
+
+                            is Response.Loading -> {}
                         }
+                    }
+
+                    is Response.Failure -> {
+                        val msg = (uiWeatherState as Response.Failure).toString()
+                        MessageShow(msg)
+                    }
+
+                    is Response.Loading -> {
+                        ProgressShow()
                     }
                 }
 
-                is Response.Failure -> {
-                    val msg = (uiWeatherState as Response.Failure).toString()
-                    MessageShow(msg)
-                }
-
-                is Response.Loading -> {
-                    ProgressShow()
-                }
+            }
+            if (showMessage) {
+                MessageShow("Connection Lost")
+            }
+            showMessage = when (uiConnectionState) {
+                true -> true
+                false -> false
             }
 
         }
+
     }
 }
 
@@ -569,21 +584,21 @@ fun ProgressShow() {
 
 @Composable
 fun MessageShow(message: String) {
-    Column(
+    Row(
         modifier = Modifier
-            .fillMaxSize()
-            .height(30.dp)
-            .background(Color.Gray),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(Color.Red.copy(.2f)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Text(message, color = Color.White)
+        Text(message, color = Color.White, fontSize = 20.sp)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
-    Log.i("dateTime", "Home: $dateLong")
+    // Log.i("dateTime", "Home: $dateLong")
     val instance = Instant.ofEpochSecond(dateLong)
     val dateFormater =
         DateTimeFormatter.ofPattern("EEE, dd MMM", Locale(lang))
@@ -593,7 +608,7 @@ fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
         DateTimeFormatter.ofPattern("hh:mm a", Locale(lang))
             .withZone(ZoneId.systemDefault())
     var formatedTime = timeFormatter.format(instance)
-    Log.i("dateTime", "Home : $formatedDate /// $formatedTime")
+    // Log.i("dateTime", "Home : $formatedDate /// $formatedTime")
     if (Locale(lang).language == "ar") {
         formatedTime = numEnToAr(formatedTime)
         formatedDate = numEnToAr(formatedDate)

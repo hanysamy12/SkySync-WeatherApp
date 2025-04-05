@@ -9,7 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skysync.data.Location
+import com.example.skysync.helper.NetworkObserver
+import com.example.skysync.helper.NetworkStatus
 import com.example.skysync.helper.Response
+import com.example.skysync.helper.Response.Failure
+import com.example.skysync.helper.Response.Loading
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.repo.DataStoreRepository
@@ -25,19 +29,22 @@ private const val TAG = "CurrentWeatherViewModel"
 class CurrentWeatherViewModelImp(
     private val repo: WeatherRepository,
     private val dataStoreRepo: DataStoreRepository,
-    private val location: Location
+    private val location: Location,
+    private val networkObserver: NetworkObserver
 ) : CurrentWeatherViewModel, ViewModel() {
 
     private val mutableWeather =
-        MutableStateFlow<Response<CurrentWeatherResponse>>(Response.Loading)
+        MutableStateFlow<Response<CurrentWeatherResponse>>(Loading)
     val weather: StateFlow<Response<CurrentWeatherResponse>> = mutableWeather
 
     private val mutableForecast =
-        MutableStateFlow<Response<ForecastWeatherResponse>>(Response.Loading)
+        MutableStateFlow<Response<ForecastWeatherResponse>>(Loading)
     val forecast: StateFlow<Response<ForecastWeatherResponse>> = mutableForecast
 
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
 
+    private val mutableShowConnectionLost = MutableStateFlow(false)
+    val showConnectionLost: StateFlow<Boolean> = mutableShowConnectionLost
     private var language by mutableStateOf("en")
     private var temperatureUnit by mutableStateOf("metric")
     private var windUnit by mutableStateOf("meter")
@@ -45,33 +52,52 @@ class CurrentWeatherViewModelImp(
     //Fahrenheit use units=imperial
     //Celsius use units=metric
     // Kelvin use units=standard
+    var tempLat: Double? = null
+    var tempLon: Double? = null
+
 
     override fun loadInitialValues(
         lat: Double?,
         lon: Double?
     ): Triple<String, String, String> {
-        Log.i(TAG, "loadInitialValues: lat $lat /// lon $lon")
+        tempLat = lat
+        tempLon = lon
         viewModelScope.launch {
-            mutableWeather.value = Response.Loading
-            mutableForecast.value = Response.Loading
-            try {
-                if (lat == null || lon == null) {
-                    language = dataStoreRepo.getLanguage().first()
-                    temperatureUnit = dataStoreRepo.getTemperatureUnit()
-                    windUnit = dataStoreRepo.getWindUnit()
-                    Log.i(TAG, "loadInitialValues: $lat ,, $lon null")
-                    location.getLocation().let { (lat, lon) ->
-                        getCurrentWeather(lat, lon, language, temperatureUnit)
-                        getForecast(lat, lon, language, temperatureUnit)
+            mutableWeather.value = Loading
+            mutableForecast.value = Loading
+            networkObserver.networkStatus.collect { state ->
+                when (state) {
+                    NetworkStatus.Available -> {
+                        mutableShowConnectionLost.value = false
+                        try {
+                            if (lat == null || lon == null) {
+                                language = dataStoreRepo.getLanguage().first()
+                                temperatureUnit = dataStoreRepo.getTemperatureUnit()
+                                windUnit = dataStoreRepo.getWindUnit()
+                                Log.i(TAG, "loadInitialValues: $lat ,, $lon null")
+                                location.getLocation().let { (locationLat, locationLon) ->
+                                    if (lat?.toInt() == tempLat?.toInt() && lon?.toInt() == tempLon?.toInt()) {
+                                        getCurrentWeather(locationLat, locationLon, language, temperatureUnit)
+                                        getForecast(locationLat, locationLon, language, temperatureUnit)
+                                    }
+                                }
+                            } else {
+                                Log.i(TAG, "loadInitialValues: $lat ,, $lon  not Null")
+                                getCurrentWeather(lat, lon, language, temperatureUnit)
+                                getForecast(lat, lon, language, temperatureUnit)
+                            }
+                        } catch (e: Exception) {
+                            mutableMessage.value = Failure(e)
+                        }
                     }
-                } else {
-                    Log.i(TAG, "loadInitialValues: $lat ,, $lon  not Null")
-                    getCurrentWeather(lat, lon, language, temperatureUnit)
-                    getForecast(lat, lon, language, temperatureUnit)
+
+                    NetworkStatus.Lost -> {
+                        Log.i(TAG, "observeNetwork: NO Connection")
+                        mutableShowConnectionLost.value = true
+                    }
                 }
-            } catch (e: Exception) {
-                mutableMessage.value = Response.Failure(e)
             }
+
         }
         return Triple(language, temperatureUnit, windUnit)
     }
@@ -85,12 +111,12 @@ class CurrentWeatherViewModelImp(
         Log.i(TAG, "getCurrentWeather: Lang is ///$language / $unit/ $lat/ $lon////")
         try {
             repo.getCurrentWeather(lat, lon, language, unit)
-                .catch { error -> mutableWeather.value = Response.Failure(error) }
+                .catch { error -> mutableWeather.value = Failure(error) }
                 .collect { weather ->
                     mutableWeather.value = Response.Success(weather)
                 }
         } catch (e: Exception) {
-            mutableMessage.value = Response.Failure(e)
+            mutableMessage.value = Failure(e)
 
         }
     }
@@ -101,13 +127,13 @@ class CurrentWeatherViewModelImp(
             Log.i(TAG, "getCurrentForecast:  $lat/ $lon////")
 
             repo.getForecast(lat, lon, language, unit)
-                .catch { error -> mutableForecast.value = Response.Failure(error) }
+                .catch { error -> mutableForecast.value = Failure(error) }
                 .collect { forecast ->
                     mutableForecast.value = Response.Success(forecast)
                 }
 
         } catch (e: Exception) {
-            mutableMessage.value = Response.Failure(e)
+            mutableMessage.value = Failure(e)
         }
     }
 }
@@ -115,9 +141,10 @@ class CurrentWeatherViewModelImp(
 class HomeViewModelFactory(
     private val repo: WeatherRepository,
     private val dataStoreRepo: DataStoreRepository,
-    private val location: Location
+    private val location: Location,
+    private val networkObserver: NetworkObserver
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CurrentWeatherViewModelImp(repo, dataStoreRepo, location) as T
+        return CurrentWeatherViewModelImp(repo, dataStoreRepo, location, networkObserver) as T
     }
 }

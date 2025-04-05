@@ -63,14 +63,13 @@ class AlertViewModelImp(
         val currentTime = System.currentTimeMillis()
         val delay = if (alertTime > currentTime) {
             alertTime - currentTime
-
         } else {
             alertTime + TimeUnit.HOURS.toMillis(24) - currentTime
         }
         val dateTime=convertDateTime(alertTime)
 
         Log.i(TAG, "addAlert: current = $currentTime // alertTime = $alertTime //// delay = $delay")
-        Log.i(TAG, "addAlert: Lat = $locationLat // Lon = $locationLon ////")
+        Log.i("Alert", "addAlert ViewModel: Lat = $locationLat // Lon = $locationLon ////")
         val request =
             OneTimeWorkRequestBuilder<MyWorkManager>().addTag(Constants.MY_WORK_MANAGER_TAG)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
