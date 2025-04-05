@@ -79,7 +79,7 @@ fun FavoriteScreen(
                     coroutineScope.launch {
                         locationToDelete = location
                         val result = snackBarHostState.showSnackbar(
-                            message = "Location deleted",
+                            message = "Delete Location !",
                             actionLabel = "Undo",
                             duration = SnackbarDuration.Short
                         )

@@ -131,7 +131,7 @@ fun AlertsScreen(viewModel: AlertViewModelImp, navController: NavController) {
                     selectedTimeInMillis?.let { time ->
                         viewModel.addAlert(time, alarmChecked)
                     }
-                }) { Text("Save") }
+                }) { Text(stringResource(R.string.save)) }
         }
         if (!isAlarmBoardVisible) {
             ElevatedButton(
@@ -146,7 +146,7 @@ fun AlertsScreen(viewModel: AlertViewModelImp, navController: NavController) {
                 onClick = {
                     isAlarmBoardVisible = true
                     viewModel.requestNotificationPermission()
-                }) { Text("Add New Alarm") }
+                }) { Text(stringResource(R.string.add_new_alarm)) }
 
         }
     }
@@ -198,7 +198,7 @@ private fun AlarmBoard(
             ), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(Modifier.padding(top = 10.dp)) {
-            Text("Set Alert", fontSize = 20.sp)
+            Text(stringResource(R.string.set_alert), fontSize = 20.sp)
         }
 
         Row(
@@ -219,7 +219,7 @@ private fun AlarmBoard(
                 Text(
                     selectedTimeInMillis?.let {
                         SimpleDateFormat("HH:mm a", Locale.getDefault()).format(Date(it))
-                    } ?: "Select Time",
+                    } ?: stringResource(R.string.select_time),
                     fontSize = 20.sp, textDecoration = TextDecoration.Underline
                 )
             }
@@ -239,10 +239,10 @@ private fun AlarmBoard(
                 contentDescription = null,
                 tint = Color.Unspecified
             )
-            Text(" Pick Location ")
+            Text(stringResource(R.string.pick_location))
             TextButton(
                  onClick = { onMapClicked() }) {
-                Text(" Map ", fontSize = 20.sp, textDecoration = TextDecoration.Underline)
+                Text(stringResource(R.string.map), fontSize = 20.sp, textDecoration = TextDecoration.Underline)
             }
         }
         Row(
@@ -257,7 +257,7 @@ private fun AlarmBoard(
                     },
                     selected = !alarmChecked
                 )
-                Text("Notification")
+                Text(stringResource(R.string.notification))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
@@ -267,7 +267,7 @@ private fun AlarmBoard(
                     selected = alarmChecked
 
                 )
-                Text("Alarm")
+                Text(stringResource(R.string.alarm))
             }
         }
 
@@ -342,7 +342,7 @@ fun AlertItem(alert: Alert, onFavClicked: () -> Unit, onDeleteClicked: () -> Uni
 
 @Composable
 fun TimePickerDialog(
-    title: String = "Select Time",
+    title: String = stringResource(R.string.select_time),
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     toggle: @Composable () -> Unit = {},
@@ -386,10 +386,10 @@ fun TimePickerDialog(
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(
                         onClick = onCancel
-                    ) { Text("Cancel") }
+                    ) { Text(stringResource(R.string.cancel)) }
                     TextButton(
                         onClick = onConfirm
-                    ) { Text("OK") }
+                    ) { Text(stringResource(R.string.ok)) }
                 }
             }
         }
