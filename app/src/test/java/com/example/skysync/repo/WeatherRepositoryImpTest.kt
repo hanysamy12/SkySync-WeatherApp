@@ -7,7 +7,6 @@ import com.example.skysync.models.StoredLocation
 import io.mockk.every
 import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,7 +17,6 @@ class WeatherRepositoryImpTest {
     private lateinit var fakeRemoteDateSource: FakeRemoteDateSource
     private lateinit var fakeLocalDataSource: FakeLocalDataSource
     private lateinit var repository: WeatherRepositoryImp
-
 
     @Test
     fun getFavoriteLocations_returnsStoredLocations() = runTest {

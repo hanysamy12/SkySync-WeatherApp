@@ -85,6 +85,7 @@ fun MapScreen(
                 buttonEnabled = true
                 lat = latLon.latitude
                 lon = latLon.longitude
+                Log.i(TAG, "MapScreen: ${latLon.latitude } //// ${latLon.longitude}")
             },
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true,

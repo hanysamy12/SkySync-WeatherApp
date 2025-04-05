@@ -1,7 +1,10 @@
 package com.example.skysync.alerts.view
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,13 +13,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -25,36 +32,70 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.skysync.R
 import com.example.skysync.alerts.viewmodel.AlertViewModelImp
 import com.example.skysync.helper.Constants
+import com.example.skysync.helper.Response
+import com.example.skysync.home.view.MessageShow
+import com.example.skysync.home.view.ProgressShow
+import com.example.skysync.models.Alert
 import com.example.skysync.ui.navigation.ScreenRoute
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 private const val TAG = "AlertsScreen"
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlertsScreen(viewModel: AlertViewModelImp, navController: NavController) {
     var isAlarmBoardVisible by remember { mutableStateOf(false) }
     var selectedTimeInMillis by remember { mutableStateOf<Long?>(null) }
     var alarmChecked by remember { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
+    var alertToDelete by remember { mutableStateOf<UUID?>(null) }
+    LaunchedEffect(Unit) {
+        viewModel.getAllAlerts()
+    }
+    val uiAlertState by viewModel.alertList.collectAsStateWithLifecycle()
+    when (uiAlertState) {
+        is Response.Loading -> ProgressShow()
+        is Response.Failure -> {
+            val msg = (uiAlertState as Response.Failure).toString()
+            MessageShow(msg)
+        }
+
+        is Response.Success<*> -> {
+            val alertList = (uiAlertState as Response.Success).data
+            Log.i(TAG, "AlertsScreen: AlertsList = $alertList")
+            AlertsListShow (alertsList = alertList, onDeleteClicked = {alert ->
+                coroutineScope.launch {
+                }
+            })
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -232,6 +273,72 @@ private fun AlarmBoard(
 
     }
 }
+
+@Composable
+private fun AlertsListShow(
+    alertsList: List<Alert>,
+    onDeleteClicked: (UUID) -> Unit
+) {
+
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item {
+            Text(
+                stringResource(R.string.alerts),
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        items(alertsList.size) {
+            val currentAlert = alertsList[it]
+            AlertItem(
+                currentAlert,
+                onFavClicked = {
+                }, onDeleteClicked = { onDeleteClicked(currentAlert.id) })
+        }
+    }
+}
+
+@Composable
+fun AlertItem(alert: Alert, onFavClicked: () -> Unit, onDeleteClicked: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = .5f),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .clickable {
+                onFavClicked()
+            },
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceAround,
+    ) {
+        Text(
+            alert.name.toString(),
+            fontSize = 22.sp,
+            maxLines = 2,
+            modifier = Modifier
+                .padding(start = 12.dp, top = 12.dp)
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            alert.time.toString(),
+            fontSize = 18.sp,
+            fontStyle = FontStyle.Italic,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier
+                .padding(start = 12.dp, bottom = 12.dp)
+        )
+
+    }
+}
+
 
 @Composable
 fun TimePickerDialog(

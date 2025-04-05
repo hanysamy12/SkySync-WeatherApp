@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.skysync.data.Location
 import com.example.skysync.data.local.WeatherLocalDataSourceImp
 import com.example.skysync.data.remote.WeatherRemoteDataSourceImp
@@ -19,17 +20,28 @@ import com.example.skysync.home.viewmodel.HomeViewModelFactory
 import com.example.skysync.repo.DataStoreRepositoryImp
 import com.example.skysync.repo.WeatherRepositoryImp
 import com.example.skysync.ui.theme.SkySyncTheme
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 private const val TAG = "NotificationActivity"
 
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        MyNotifications.SoundManager.stopAlarm() ////
+        MyNotifications.SoundManager.stopAlarm()
         super.onCreate(savedInstanceState)
+
         val receivedLat = intent.getDoubleExtra(Constants.NOTIFICATION_LAT, 0.0)
         val receivedLon = intent.getDoubleExtra(Constants.NOTIFICATION_LON, 0.0)
-        intent.removeExtra(Constants.NOTIFICATION_LAT)
-        intent.removeExtra(Constants.NOTIFICATION_LON)
+
+        val rep = WeatherRepositoryImp(
+            WeatherRemoteDataSourceImp.getInstance(),
+            WeatherLocalDataSourceImp.getInstance(this)
+        )
+       val alertId = intent.getStringExtra(Constants.ALERT_ID)
+        lifecycleScope.launch {
+            rep.deleteAlert(UUID.fromString(alertId))
+            Log.d("notificationId", "Notification Activity ${UUID.fromString(alertId)}  ///${UUID.fromString(alertId).javaClass.name}")
+        }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 startActivity(Intent(this@NotificationActivity, MainActivity::class.java).apply {
@@ -54,7 +66,7 @@ class NotificationActivity : ComponentActivity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     HomeScreen(homeViewModel, receivedLat, receivedLon)
                 } else {
-                    Log.e(TAG, "onCreate: NOTSHOWN")
+                    Log.e(TAG, "onCreate: ")
                 }
             }
         }

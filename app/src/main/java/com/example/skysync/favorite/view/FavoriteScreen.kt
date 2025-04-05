@@ -1,6 +1,5 @@
 package com.example.skysync.favorite.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +42,6 @@ import com.example.skysync.models.StoredLocation
 import com.example.skysync.ui.navigation.ScreenRoute
 import kotlinx.coroutines.launch
 
-private const val TAG = "FavoriteScreen"
 @Composable
 fun FavoriteScreen(
     viewModel: FavoriteViewModelImp,

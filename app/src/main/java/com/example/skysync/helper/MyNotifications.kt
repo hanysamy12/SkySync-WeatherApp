@@ -9,13 +9,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.skysync.NotificationActivity
 import com.example.skysync.R
+import com.example.skysync.repo.WeatherRepository
+import java.util.UUID
 
 class MyNotifications(private val context: Context) {
     fun createNotificationChannel() {
@@ -26,7 +30,8 @@ class MyNotifications(private val context: Context) {
                 this.description = "SkySync Weather"
                 enableVibration(true)
                 vibrationPattern = longArrayOf(2, 500, 200, 44)
-                setSound(null, null)
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
 
             }
@@ -36,24 +41,30 @@ class MyNotifications(private val context: Context) {
     }
 
     @Suppress("MissingPermission")
-    fun sendNotification(isAlarm: Boolean,lat: Double,lon: Double) {
+    fun sendNotification(alertId: UUID,isAlarm: Boolean,lat: Double,lon: Double) {
         createNotificationChannel()
         val intent = Intent(context, NotificationActivity::class.java).apply {
+            putExtra(Constants.ALERT_ID,alertId.toString())
             putExtra(Constants.NOTIFICATION_LAT, lat)
             putExtra(Constants.NOTIFICATION_LON, lon)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        val notificationId = alertId.hashCode()
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            notificationId,
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT //to force update extras
-
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        val stopIntent = Intent(context, StopAlarmReceiver::class.java)
+        val stopIntent = Intent(context, StopAlarmReceiver::class.java).apply {
+            putExtra(Constants.ALERT_ID, alertId.toString())
+        }
+
+        Log.d("notificationId", "doWork() called ID $alertId  ///${alertId.javaClass.name}")
+
         val stopPendingIntent = PendingIntent.getBroadcast(
             context,
-            1,
+            notificationId,
             stopIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -62,7 +73,7 @@ class MyNotifications(private val context: Context) {
             .setSmallIcon(R.drawable.ic_setting_temp)
             .setContentTitle("SkySync")
             .setContentText("SkySync Remembering You To Check The Weather Now")
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
@@ -70,7 +81,7 @@ class MyNotifications(private val context: Context) {
             .setAutoCancel(true)
             .addAction(R.drawable.ic_delete, "Stop", stopPendingIntent)
         with(NotificationManagerCompat.from(context)) {
-            notify(1001, builder.build())
+            notify(alertId.hashCode(), builder.build())
         }
         if (isAlarm) {
             SoundManager.playAlarm(context)
@@ -91,6 +102,7 @@ class MyNotifications(private val context: Context) {
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
+
         }
     }
 
