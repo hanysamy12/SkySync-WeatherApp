@@ -44,7 +44,6 @@ import com.example.skysync.favorite.view.MapScreen
 import com.example.skysync.favorite.viewmodel.FavoriteViewModelImp
 import com.example.skysync.favorite.viewmodel.FavoriteViwModelFactory
 import com.example.skysync.helper.Constants
-import com.example.skysync.helper.MyNotifications
 import com.example.skysync.home.view.HomeScreen
 import com.example.skysync.home.viewmodel.CurrentWeatherViewModelImp
 import com.example.skysync.home.viewmodel.HomeViewModelFactory
@@ -103,8 +102,13 @@ class MainActivity : ComponentActivity() {
 
         val alertViewModel = ViewModelProvider(
             this, AlertViewModelFactory(
-                MyNotifications(this),
-                WorkManager.getInstance(this@MainActivity), this@MainActivity
+                WeatherRepositoryImp(
+                    WeatherRemoteDataSourceImp.getInstance(),
+                    WeatherLocalDataSourceImp.getInstance(this.applicationContext)
+                ),
+                WorkManager.getInstance(this@MainActivity),
+                Location(this@MainActivity, DataStoreRepositoryImp(this.application)),
+                this@MainActivity
             )
         )[AlertViewModelImp::class.java]
         setContent {
@@ -147,7 +151,7 @@ fun MainScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState)},
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             Box(modifier = Modifier.height(60.dp)) {
                 BottomNavigationBar((navController))
@@ -189,7 +193,7 @@ fun MainScreen(
                 FavoriteScreen(favoriteViewModel, navController, snackBarHostState)
             }
             composable(route = ScreenRoute.Alerts.route) {
-                AlertsScreen(alertViewModelImp,navController)
+                AlertsScreen(alertViewModelImp, navController)
             }
             composable(route = ScreenRoute.Settings.route) {
                 SettingsScreen(settingsViewModel, navController)
@@ -202,7 +206,12 @@ fun MainScreen(
                     ScreenRoute.Alerts.route -> Constants.ALERTS_SCREEN
                     else -> Constants.FAVORITE_SCREEN
                 }
-                MapScreen(favoriteViewModel,alertViewModelImp, navController, sourceScreen = sourceScreen)
+                MapScreen(
+                    favoriteViewModel,
+                    alertViewModelImp,
+                    navController,
+                    sourceScreen = sourceScreen
+                )
             }
             composable<ScreenRoute.FavoriteDetails> { navBackStackEntry ->
                 val data = navBackStackEntry.toRoute<ScreenRoute.FavoriteDetails>()

@@ -14,21 +14,15 @@ import android.os.Build
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import com.example.skysync.helper.Constants
 import com.example.skysync.repo.DataStoreRepository
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -133,6 +127,7 @@ class Location(
                 geoCode.getFromLocation(latitude, longitude, 1, object : GeocodeListener {
                     override fun onGeocode(p0: MutableList<Address>) {
                         cont.resume(p0[0].countryName + ", " + p0[0].adminArea)
+                        Log.i(TAG, "getGeoLocation: $latitude // $longitude // ${p0[0].countryName}")
 
                     }
 

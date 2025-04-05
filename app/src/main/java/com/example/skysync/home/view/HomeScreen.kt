@@ -1,6 +1,7 @@
 package com.example.skysync.home.view
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -455,7 +456,6 @@ fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
         modifier = Modifier
             .height(120.dp)
             .padding(8.dp),
-
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -466,14 +466,11 @@ fun HourItem(hourItem: ListItem?, lang: String, tempUnit: String) {
             contentDescription = "Product Image",
             modifier = Modifier
                 .size(40.dp), colorFilter = null
-
         )
-
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Top
         ) {
-
             val temp = if (lang == "ar") {
                 numEnToAr(hourItem?.main?.temp.toString().toDouble().roundToInt().toString())
             } else {
@@ -502,7 +499,6 @@ fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
     ) {
         Row(
             modifier = Modifier
-                //.weight(2f)
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -551,8 +547,6 @@ fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
                 Text(temUnit, fontSize = 8.sp)
             }
         }
-
-
     }
 }
 
@@ -589,7 +583,7 @@ fun MessageShow(message: String) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
-
+    Log.i("dateTime", "Home: $dateLong")
     val instance = Instant.ofEpochSecond(dateLong)
     val dateFormater =
         DateTimeFormatter.ofPattern("EEE, dd MMM", Locale(lang))
@@ -599,9 +593,11 @@ fun convertDateTime(dateLong: Long, lang: String): Pair<String, String> {
         DateTimeFormatter.ofPattern("hh:mm a", Locale(lang))
             .withZone(ZoneId.systemDefault())
     var formatedTime = timeFormatter.format(instance)
+    Log.i("dateTime", "Home : $formatedDate /// $formatedTime")
     if (Locale(lang).language == "ar") {
         formatedTime = numEnToAr(formatedTime)
         formatedDate = numEnToAr(formatedDate)
+
     }
     return Pair(formatedDate, formatedTime)
 }

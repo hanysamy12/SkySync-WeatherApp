@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.skysync.models.Alert
 import com.example.skysync.models.StoredLocation
 
-@Database(entities = [StoredLocation::class], version = 1)
+@Database(entities = [StoredLocation::class, Alert::class], version = 1)
 abstract class DataBase : RoomDatabase() {
     abstract fun getLocationDao(): LocationsDAO
+    abstract fun getAlertDao(): AlertsDAO
 
     companion object {
         private var INSTANCE: DataBase? = null

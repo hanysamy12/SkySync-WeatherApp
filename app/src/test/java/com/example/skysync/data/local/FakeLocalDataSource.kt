@@ -1,5 +1,6 @@
 package com.example.skysync.data.local
 
+import com.example.skysync.models.Alert
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,5 +21,17 @@ class FakeLocalDataSource(private val locations : MutableList<StoredLocation> =m
         val removed = locations.remove(storedLocation)
         locationsFlow.value = locations.toList() // Update the flow
         return if (removed) 1 else 0
+    }
+
+    override fun getAlerts(): Flow<List<Alert>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insertAlert(alert: Alert): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteAlert(alertId: Long): Int {
+        TODO("Not yet implemented")
     }
 }

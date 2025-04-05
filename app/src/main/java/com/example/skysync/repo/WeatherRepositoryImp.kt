@@ -2,11 +2,13 @@ package com.example.skysync.repo
 
 import com.example.skysync.data.local.WeatherLocalDataSource
 import com.example.skysync.data.remote.WeatherRemoteDataSource
+import com.example.skysync.models.Alert
 import com.example.skysync.models.CurrentWeatherResponse
 import com.example.skysync.models.ForecastWeatherResponse
 import com.example.skysync.models.SearchLocationsResponseItem
 import com.example.skysync.models.StoredLocation
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 class WeatherRepositoryImp(
     private val remoteDataSource: WeatherRemoteDataSource,
@@ -47,5 +49,17 @@ class WeatherRepositoryImp(
 
     override suspend fun deleteFavoriteLocation(storedLocation: StoredLocation): Int {
         return localDataSource.deleteLocation(storedLocation)
+    }
+
+    override fun getAlerts(): Flow<List<Alert>> {
+        return localDataSource.getAlerts()
+    }
+
+    override suspend fun adNewAlert(alert: Alert): Long {
+        return localDataSource.insertAlert(alert)
+    }
+
+    override suspend fun deleteAlert(alertId: UUID): Int {
+        return localDataSource.deleteAlert(alertId)
     }
 }

@@ -31,6 +31,7 @@ class Constants {
         const val NOTIFICATION_LON = "notification_lon"
         const val NOTIFICATION_LOCATION_LAT = "notification_location_lat"
         const val NOTIFICATION_LOCATION_LON = "notification_location_lon"
+        const val ALERT_ID = "alert_id"
 
 
         //Map Screen
