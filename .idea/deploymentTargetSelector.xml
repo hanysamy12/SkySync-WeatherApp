@@ -8,6 +8,12 @@
       <SelectionState runConfigName="LocationsDAOTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="WeatherLocalDataSourceImpTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="insertLocation_getAllLocations_returnsInsertedLocation()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

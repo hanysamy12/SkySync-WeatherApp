@@ -140,7 +140,7 @@ fun AlertsScreen(viewModel: AlertViewModelImp, navController: NavController) {
                     .padding(horizontal = 20.dp),
                 colors = ButtonDefaults.elevatedButtonColors(
                     MaterialTheme.colorScheme.primary.copy(
-                        .3f
+                        .6f
                     )
                 ),
                 onClick = {

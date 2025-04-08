@@ -42,7 +42,6 @@ class CurrentWeatherViewModelImp(
     val forecast: StateFlow<Response<ForecastWeatherResponse>> = mutableForecast
 
     private val mutableMessage: MutableLiveData<Response<String>> = MutableLiveData()
-
     private val mutableShowConnectionLost = MutableStateFlow(false)
     val showConnectionLost: StateFlow<Boolean> = mutableShowConnectionLost
     private var language by mutableStateOf("en")
@@ -75,12 +74,15 @@ class CurrentWeatherViewModelImp(
                                 temperatureUnit = dataStoreRepo.getTemperatureUnit()
                                 windUnit = dataStoreRepo.getWindUnit()
                                 Log.i(TAG, "loadInitialValues: $lat ,, $lon null")
+                                // 29.305581206555264/ 30.841450095176697////
                                 location.getLocation().let { (locationLat, locationLon) ->
                                     if (lat?.toInt() == tempLat?.toInt() && lon?.toInt() == tempLon?.toInt()) {
                                         getCurrentWeather(locationLat, locationLon, language, temperatureUnit)
                                         getForecast(locationLat, locationLon, language, temperatureUnit)
                                     }
                                 }
+                               /* getCurrentWeather(29.305, 30.841450, language, temperatureUnit)
+                                getForecast(29.305, 30.841450, language, temperatureUnit)*/
                             } else {
                                 Log.i(TAG, "loadInitialValues: $lat ,, $lon  not Null")
                                 getCurrentWeather(lat, lon, language, temperatureUnit)

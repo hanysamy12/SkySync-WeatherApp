@@ -22,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -98,7 +100,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
     Box(Modifier.fillMaxSize()) {
         Image(
             painter = rememberAsyncImagePainter(
-                R.drawable.bg_simple_stars,
+                R.drawable.bg_home,
                 imageLoader = ImageLoader(LocalContext.current).newBuilder()
                     .components {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -110,6 +112,7 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
         Column(Modifier.fillMaxSize()) {
 
             Column(
@@ -141,7 +144,10 @@ fun HomeScreen(viewModel: CurrentWeatherViewModelImp, lat: Double?, lon: Double?
                                 MessageShow(msg)
                             }
 
-                            is Response.Loading -> {}
+                            is Response.Loading -> {
+                                ProgressShow()
+
+                            }
                         }
                     }
 
@@ -297,143 +303,138 @@ fun CurrentWeatherShow(
 
 
 
-            Row( // parent
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = .3f),
-                        RoundedCornerShape(16.dp)
-                    )
-            ) {
-                Column(
-                    modifier = Modifier //left
-                        .weight(1f)
-                        .padding(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .fillMaxWidth(1f)
-                            .padding(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
+            Card (colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .3f))){
+                Row {
+                    Column(
+                        modifier = Modifier //left
+                            .weight(1f)
+                            .padding(10.dp)
                     ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_humidity),
-                            contentDescription = "humidity icon",
+                        Row(
                             modifier = Modifier
-                                .size(22.dp)
-                                .weight(1f),
-                            tint = Color.Unspecified
-                        )
-
-                        Column(modifier = Modifier.weight(2f)) {
-                            Text(stringResource(R.string.humidity), fontSize = 14.sp)
-                            val humidity = if (lang == "ar") {
-                                numEnToAr(currentWeather?.main?.humidity.toString())
-                            } else {
-                                currentWeather?.main?.humidity.toString()
-                            }
-                            Text(
-                                "$humidity ${stringResource(R.string.percentage_sign)}",
-                                fontSize = 12.sp
+                                .fillMaxHeight(0.5f)
+                                .fillMaxWidth(1f)
+                                .padding(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_humidity),
+                                contentDescription = "humidity icon",
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .weight(1f),
+                                tint = Color.Unspecified
                             )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha = .3f))
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .padding(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_wind),
-                            contentDescription = "wind icon",
-                            modifier = Modifier
-                                .size(22.dp)
-                                .weight(1f), tint = Color.Unspecified
-                        )
-                        Column(modifier = Modifier.weight(2f)) {
-                            Text(stringResource(R.string.wind_speed), fontSize = 14.sp)
-                            val speed = if (lang == "ar") {
-                                numEnToAr(currentWeather?.wind?.speed.toString())
-                            } else {
-                                currentWeather?.wind?.speed.toString()
-                            }
-                            Text("$speed $windUnit", fontSize = 12.sp)
-                        }
-                    }
-                }
 
-                Column(
-                    modifier = Modifier //right
-                        .weight(1f)
-                        .padding(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .padding(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_pressure),
-                            contentDescription = "pressure icon",
-                            modifier = Modifier
-                                .size(22.dp)
-                                .weight(1f), tint = Color.Unspecified
-                        )
-                        Column(modifier = Modifier.weight(2f)) {
-                            Text(stringResource(R.string.pressure), fontSize = 14.sp)
-                            val pressure = if (lang == "ar") {
-                                numEnToAr(currentWeather?.main?.pressure.toString())
-                            } else {
-                                currentWeather?.main?.pressure.toString()
+                            Column(modifier = Modifier.weight(2f)) {
+                                Text(stringResource(R.string.humidity), fontSize = 14.sp)
+                                val humidity = if (lang == "ar") {
+                                    numEnToAr(currentWeather?.main?.humidity.toString())
+                                } else {
+                                    currentWeather?.main?.humidity.toString()
+                                }
+                                Text(
+                                    "$humidity ${stringResource(R.string.percentage_sign)}",
+                                    fontSize = 12.sp
+                                )
                             }
-                            Text(pressure, fontSize = 12.sp)
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .height(2.dp)
+                                .background(colorResource(id = R.color.white).copy(alpha = .3f))
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxHeight(0.5f)
+                                .padding(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_wind),
+                                contentDescription = "wind icon",
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .weight(1f), tint = Color.Unspecified
+                            )
+                            Column(modifier = Modifier.weight(2f)) {
+                                Text(stringResource(R.string.wind_speed), fontSize = 14.sp)
+                                val speed = if (lang == "ar") {
+                                    numEnToAr(currentWeather?.wind?.speed.toString())
+                                } else {
+                                    currentWeather?.wind?.speed.toString()
+                                }
+                                Text("$speed $windUnit", fontSize = 12.sp)
+                            }
                         }
                     }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .height(2.dp)
-                            .background(colorResource(id = R.color.white).copy(alpha = .3f))
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .padding(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
+
+                    Column(
+                        modifier = Modifier //right
+                            .weight(1f)
+                            .padding(10.dp)
                     ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_cloud),
-                            contentDescription = "cloud icon",
+                        Row(
                             modifier = Modifier
-                                .size(22.dp)
-                                .weight(1f), tint = Color.Unspecified
-                        )
-                        Column(modifier = Modifier.weight(2f)) {
-                            Text(stringResource(R.string.cloud), fontSize = 14.sp)
-                            val cloud = if (lang == "ar") {
-                                numEnToAr(currentWeather?.clouds?.all.toString())
-                            } else {
-                                currentWeather?.clouds?.all.toString()
-                            }
-                            Text(
-                                "$cloud ${stringResource(R.string.percentage_sign)}",
-                                fontSize = 12.sp
+                                .fillMaxHeight(0.5f)
+                                .padding(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_pressure),
+                                contentDescription = "pressure icon",
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .weight(1f), tint = Color.Unspecified
                             )
+                            Column(modifier = Modifier.weight(2f)) {
+                                Text(stringResource(R.string.pressure), fontSize = 14.sp)
+                                val pressure = if (lang == "ar") {
+                                    numEnToAr(currentWeather?.main?.pressure.toString())
+                                } else {
+                                    currentWeather?.main?.pressure.toString()
+                                }
+                                Text(pressure, fontSize = 12.sp)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .height(2.dp)
+                                .background(colorResource(id = R.color.white).copy(alpha = .3f))
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxHeight(0.5f)
+                                .padding(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_cloud),
+                                contentDescription = "cloud icon",
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .weight(1f), tint = Color.Unspecified
+                            )
+                            Column(modifier = Modifier.weight(2f)) {
+                                Text(stringResource(R.string.cloud), fontSize = 14.sp)
+                                val cloud = if (lang == "ar") {
+                                    numEnToAr(currentWeather?.clouds?.all.toString())
+                                } else {
+                                    currentWeather?.clouds?.all.toString()
+                                }
+                                Text(
+                                    "$cloud ${stringResource(R.string.percentage_sign)}",
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -447,14 +448,16 @@ fun CurrentWeatherShow(
 fun ForecastShow(forecast: ForecastWeatherResponse?, lang: String, temUnit: String) {
 
     Column(modifier = Modifier.fillMaxSize()) {
-        LazyRow(
-            modifier = Modifier.background(
-                MaterialTheme.colorScheme.primary.copy(alpha = .3f),
-                shape = RoundedCornerShape(16.dp)
-            )
-        ) {
-            items(8) { i -> HourItem(forecast?.list?.get(i), lang, temUnit) }
+        Card (colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .3f))){
+            LazyRow(
+                modifier = Modifier.background(
+                    MaterialTheme.colorScheme.primary.copy(alpha = .3f),
+                    shape = RoundedCornerShape(16.dp)
+                )
+            ) {
+                items(8) { i -> HourItem(forecast?.list?.get(i), lang, temUnit) }
 
+            }
         }
         val daysList =
             forecast?.list?.filterIndexed { index, _ -> index == 0 || index % 8 == 0 }
@@ -508,7 +511,9 @@ fun DaysItem(dayItem: ListItem?, lang: String, temUnit: String) {
             .fillMaxWidth()
             .height(70.dp)
             .padding(vertical = 8.dp)
+            .background(MaterialTheme.colorScheme.primary.copy(.1f ),RoundedCornerShape(24.dp))
             .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(24.dp)),
+
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {

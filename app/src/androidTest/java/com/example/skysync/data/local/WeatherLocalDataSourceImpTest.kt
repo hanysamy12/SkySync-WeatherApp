@@ -29,8 +29,10 @@ class WeatherLocalDataSourceImpTest {
         ).allowMainThreadQueries().build()
         dao = dataBase.getLocationDao()
         localDataSource =
-            WeatherLocalDataSourceImp.getInstance(ApplicationProvider.getApplicationContext()) as WeatherLocalDataSourceImp
+            WeatherLocalDataSourceImp.getInstance(ApplicationProvider.getApplicationContext())
+                    as WeatherLocalDataSourceImp
     }
+
     @Test
     fun insertLocation_getAllLocations_returnsInsertedLocation() = runTest {
         //Given
@@ -40,7 +42,7 @@ class WeatherLocalDataSourceImpTest {
         val locations = localDataSource.getAllLocations().first()
         //Then
         assertNotNull(locations)
-      assertThat(listOf(location), `is`(locations))
+        assertThat(listOf(location), `is`(locations))
     }
 
     @Test

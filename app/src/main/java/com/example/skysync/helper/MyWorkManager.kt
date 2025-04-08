@@ -26,7 +26,6 @@ class MyWorkManager(private val context: Context, workerParams: WorkerParameters
            // Log.d("notificationId", "WorkManager $id  ///${id.javaClass.name}")
             Log.i("Alert", "doWork: Lat $lat Lon $lon")
             return Result.success()
-
         } catch (e: Exception) {
             return Result.failure(
                 workDataOf(

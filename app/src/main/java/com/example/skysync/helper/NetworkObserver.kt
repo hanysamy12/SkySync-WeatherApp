@@ -22,9 +22,7 @@ class NetworkObserver(context: Context) {
             override fun onAvailable(network: Network) {
                // Log.i("TAG", "The default network is now: $network")
                 mutableNetworkStatus.value = NetworkStatus.Available
-
             }
-
             override fun onLost(network: Network) {
                 //Log.i(TAG, "onCreate: No Internet Lost")
                 mutableNetworkStatus.value = NetworkStatus.Lost

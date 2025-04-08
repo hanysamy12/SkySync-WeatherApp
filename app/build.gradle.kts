@@ -1,4 +1,4 @@
-import org.gradle.kotlin.dsl.androidTestImplementation
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,6 +11,9 @@ plugins {
 android {
     namespace = "com.example.skysync"
     compileSdk = 35
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.skysync"
@@ -20,8 +23,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // manifestPlaceholders=[MAPS_API_KEY: MAPS_API_KEY]
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "MAPS_API_KEY", "\" ${properties.getProperty("MAPS_API_KEY")}\"")
+        manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY")
     }
 
     buildTypes {
@@ -97,18 +102,17 @@ dependencies {
     val work_version = "2.10.0"
     implementation("androidx.work:work-runtime-ktx:$work_version")
     ///
-    implementation ("androidx.compose.material:material:1.7.8")// Or the latest version
-   //////Test
-    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
-    testImplementation ("io.mockk:mockk:1.13.8")
-    testImplementation ("androidx.test.ext:junit-ktx:1.1.5")
-    testImplementation ("androidx.test:core-ktx:1.5.0")
-    testImplementation ("org.robolectric:robolectric:4.11.1")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+    implementation("androidx.compose.material:material:1.7.8")// Or the latest version
+    //////Test
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     ///Gif
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
-
 
 
 }

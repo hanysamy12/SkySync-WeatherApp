@@ -19,6 +19,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,6 +32,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -112,17 +115,26 @@ fun MapScreen(
                         viewModel.updateQuery(query)
                         searchQuery = query
                         locationSelected = false
-                     //   Log.i(TAG, "MapScreen: $query")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
                     shape = RoundedCornerShape(16.dp),
                     label = { stringResource(R.string.search) },
+
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
                     },
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.secondary, // Background when focused
+                        //unfocusedContainerColor = Color.LightGray,   // Background when unfocused
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black, // Force same color always
+                        disabledTextColor = Color.Black,
+                        errorTextColor = Color.Red
+
+                    )
                 )
                 if (!locationSelected) {
                     if (locations.isNotEmpty()) {
@@ -153,6 +165,7 @@ fun MapScreen(
             if (sourceScreen == Constants.FAVORITE_SCREEN) {
                 ElevatedButton(
                     onClick = {
+                        Log.i(TAG, "MapScreen: Add FavoriteLocation lat ${clickedPosition?.latitude} // ${clickedPosition?.longitude}")
                         coroutineScope.launch { viewModel.addFavoriteLocation(clickedPosition) }
                         navController.popBackStack()
                     },

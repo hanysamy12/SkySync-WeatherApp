@@ -35,8 +35,6 @@ class Location(
     private val activity: Activity,
     private val dataStoreRepository: DataStoreRepository
 ) {
-
-
     suspend fun getLocation() : Pair<Double, Double> {
       return (if (checkPermissions()) {
           if (isLocationEnabled()) {
@@ -108,10 +106,9 @@ class Location(
 
 
 
-    private suspend fun enableLocationService() {
+    private fun enableLocationService() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         activity.startActivity(intent)
-        getLocation() ////////
     }
 
     private suspend fun addLatLongToSharedPref(lat: Double, lon: Double) {

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,13 +31,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.skysync.helper.Constants
 import com.example.skysync.R
+import com.example.skysync.helper.Constants
 import com.example.skysync.settings.viewmodel.SettingsViewModel
 import com.example.skysync.ui.navigation.ScreenRoute
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
+fun SettingsScreen(viewModel: SettingsViewModel, navController: NavController) {
 
     //language
     var englishChecked by remember { mutableStateOf(false) }
@@ -55,28 +54,21 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
     var fahrenheitChecked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        val settings=viewModel.getCredentialFromPref()
-        when(settings[Constants.SETTINGS_LANGUAGE]) {
+        //language
+        val settings = viewModel.getCredentialFromPref()
+        when (settings[Constants.SETTINGS_LANGUAGE]) {
             "en" -> englishChecked = true
             "ar" -> arabicChecked = true
         }
 
-        // location
-/*
-        when(settings[Constants.SETTINGS_LOCATION]) {
-            "gps" -> gpsChecked = true
-            "map" -> mapChecked = true
-        }
-*/
-
         //  wind
-        when(settings[Constants.SETTINGS_WIND]) {
+        when (settings[Constants.SETTINGS_WIND]) {
             "meter" -> meterChecked = true
             "mile" -> mileChecked = true
         }
 
         //  temperature
-        when(settings[Constants.SETTINGS_TEMP]) {
+        when (settings[Constants.SETTINGS_TEMP]) {
             "standard" -> kelvinChecked = true
             "metric" -> celsiusChecked = true
             "imperial" -> fahrenheitChecked = true
@@ -92,14 +84,17 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
         Column(
             modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ElevatedCard( //language
+            ElevatedCard(   //language
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp), colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
+                    containerColor = MaterialTheme.colorScheme.primary.copy(.6f)
                 )
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_languagesvg),
                         contentDescription = stringResource(R.string.language_icon),
@@ -110,8 +105,10 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                     Text(stringResource(R.string.language), fontSize = 18.sp)
                 }
 
-                Row(modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Row(
                         Modifier
@@ -120,13 +117,6 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        /*Checkbox(
-                            checked = englishChecked, onCheckedChange = {
-                                englishChecked = it
-                                arabicChecked = !it
-                                    viewModel.setLanguage("en")
-
-                            })*/
                         RadioButton(
                             selected = englishChecked,
                             onClick = {
@@ -142,12 +132,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        /*Checkbox(
-                            checked = arabicChecked, onCheckedChange = {
-                                arabicChecked = it
-                                englishChecked = !it
-                                viewModel.setLanguage("ar")
-                            })*/
+
                         RadioButton(
                             selected = arabicChecked,
                             onClick = {
@@ -164,10 +149,13 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp), colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
+                    containerColor = MaterialTheme.colorScheme.primary.copy(.6f)
                 )
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings_map),
                         contentDescription = stringResource(R.string.location_icon),
@@ -178,8 +166,10 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                     Text(stringResource(R.string.location), fontSize = 18.sp)
                 }
 
-                Row(modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Row(
                         Modifier
@@ -191,11 +181,13 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
 
                         RadioButton(
                             selected = gpsChecked,
-                            onClick = { gpsChecked = true
+                            onClick = {
+                                gpsChecked = true
                                 mapChecked = false
-                                viewModel.setLocationWay("gps") },
+                                viewModel.setLocationWay("gps")
+                            },
 
-                        )
+                            )
                         Text(stringResource(R.string.gps), fontSize = 14.sp)
                     }
                     Row(
@@ -218,10 +210,13 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp), colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
+                    containerColor = MaterialTheme.colorScheme.primary.copy(.6f)
                 )
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_temp),
                         contentDescription = stringResource(R.string.temperature_icon),
@@ -232,8 +227,10 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                     Text(stringResource(R.string.temperature), fontSize = 18.sp)
                 }
 
-                Row(modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Row(
                         Modifier
@@ -244,7 +241,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                             selected = kelvinChecked, onClick = {
                                 kelvinChecked = true
                                 celsiusChecked = false
-                                fahrenheitChecked=false
+                                fahrenheitChecked = false
                                 viewModel.setTempUnit("standard")
                                 meterChecked = true
                                 mileChecked = false
@@ -261,7 +258,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                             selected = celsiusChecked, onClick = {
                                 celsiusChecked = true
                                 kelvinChecked = false
-                                fahrenheitChecked=false
+                                fahrenheitChecked = false
                                 viewModel.setTempUnit("metric")
                                 meterChecked = true
                                 mileChecked = false
@@ -276,7 +273,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                             selected = fahrenheitChecked, onClick = {
                                 fahrenheitChecked = true
                                 celsiusChecked = false
-                                kelvinChecked =false
+                                kelvinChecked = false
                                 viewModel.setTempUnit("imperial")
                                 mileChecked = true
                                 meterChecked = false
@@ -290,10 +287,13 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp), colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
+                    containerColor = MaterialTheme.colorScheme.primary.copy(.6f)
                 )
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_setting_wind),
                         contentDescription = stringResource(R.string.wind_icon),
@@ -304,8 +304,10 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                     Text(stringResource(R.string.wind_speed), fontSize = 18.sp)
                 }
 
-                Row(modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Row(
                         Modifier
@@ -321,7 +323,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                                 viewModel.setWindUnit("mile")
                                 fahrenheitChecked = true
                                 celsiusChecked = false
-                                kelvinChecked =false
+                                kelvinChecked = false
                                 viewModel.setTempUnit("imperial")
                             })
                         Text(stringResource(R.string.miles_hour), fontSize = 14.sp)
@@ -338,7 +340,7 @@ fun SettingsScreen(viewModel: SettingsViewModel,navController: NavController) {
                                 viewModel.setWindUnit("meter")
                                 celsiusChecked = true
                                 kelvinChecked = false
-                                fahrenheitChecked=false
+                                fahrenheitChecked = false
                                 viewModel.setTempUnit("metric")
                             })
                         Text(stringResource(R.string.meter_sec), fontSize = 14.sp)

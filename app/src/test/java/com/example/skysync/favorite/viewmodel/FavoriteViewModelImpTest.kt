@@ -41,8 +41,9 @@ class FavoriteViewModelImpTest {
             name = name
         )
         coEvery { location.getGeoLocation(latLon.latitude,latLon.longitude) } returns name
-        //Then
+        //When
         val result = viewModel.addFavoriteLocation(latLon)
+        //Then
         assertThat(result,notNullValue())
         coVerify (exactly = 1){ repo.adNewFavoriteLocations(returnedLocation) }
     }
@@ -54,7 +55,7 @@ class FavoriteViewModelImpTest {
             StoredLocation(2,40.0, -74.0, "Giza")
         )
         coEvery { repo.getFavoriteLocations() } returns flowOf(testLocations)
-        //When
+        //Then
         val result = viewModel.favoriteList.value
         assertThat(result,`is`(Response.Loading))
     }

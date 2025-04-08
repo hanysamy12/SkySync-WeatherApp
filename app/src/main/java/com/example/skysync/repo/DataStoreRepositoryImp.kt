@@ -26,8 +26,6 @@ class DataStoreRepositoryImp(val application: Application) : DataStoreRepository
         }
     }
 
-
-
     override fun getLatLongFromDataStore(): Flow<Pair<Double?, Double?>> {
         return application.locationDataStore.data.map { pref ->
             val lat = pref[Constants.CURRENT_LAT_KEY]
